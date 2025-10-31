@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
-import { Header } from './Header';
-import { Footer } from './Footer';
+import Footer from './Footer';
+import Header from './Header';
+
 
 interface ClientLayoutProps {
   children: ReactNode;
@@ -9,11 +10,11 @@ interface ClientLayoutProps {
 export const ClientLayout = ({ children }: ClientLayoutProps) => {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <Header></Header>
       <main className="container mx-auto px-4 py-8">
         {children}
       </main>
-      <Footer />
+      <Footer></Footer>
     </div>
   );
 };

@@ -1,67 +1,53 @@
 'use client';
-import { Button } from '@/components/ui/ButtonCli';
-import Link from 'next/link';
-
 interface HeroSectionProps {
   title: string;
   subtitle: string;
-  primaryAction?: {
-    label: string;
-    href: string;
-  };
-  secondaryAction?: {
-    label: string;
-    href: string;
-  };
-  className?: string;
+  primaryButtonText: string;
+  secondaryButtonText: string;
+  onPrimaryClick: () => void;
+  onSecondaryClick: () => void;
+  backgroundImage?: string;
 }
 
-export const HeroSection = ({
+export default function HeroSection({
   title,
   subtitle,
-  primaryAction,
-  secondaryAction,
-  className = ''
-}: HeroSectionProps) => {
+  primaryButtonText,
+  secondaryButtonText,
+  onPrimaryClick,
+  onSecondaryClick,
+  backgroundImage = '/api/placeholder/1920/800'
+}: HeroSectionProps) {
   return (
-    <section className={`container mx-auto px-4 py-16 md:py-24 ${className}`}>
-      <div className="grid md:grid-cols-2 gap-12 items-center">
-        <div>
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+    <section 
+      className="relative h-screen bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: `url(${backgroundImage})` }}
+    >
+      <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+      <div className="relative z-10 h-full flex items-center justify-center text-center text-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">
             {title}
           </h1>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-xl md:text-2xl mb-8 animate-fade-in-delay">
             {subtitle}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            {primaryAction && (
-              <Link href={primaryAction.href}>
-                <Button size="lg">
-                  {primaryAction.label}
-                </Button>
-              </Link>
-            )}
-            {secondaryAction && (
-              <Link href={secondaryAction.href}>
-                <Button variant="outline" size="lg">
-                  {secondaryAction.label}
-                </Button>
-              </Link>
-            )}
-          </div>
-        </div>
-        
-        <div className="relative">
-          <div className="bg-indigo-200 rounded-2xl p-8 aspect-square flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-32 h-32 bg-indigo-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-white text-4xl">🎮</span>
-              </div>
-              <p className="text-gray-600">Imagen destacada de juguetes</p>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-delay-2">
+            <button
+              onClick={onPrimaryClick}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg text-lg font-semibold transition-colors duration-300 transform hover:scale-105"
+            >
+              {primaryButtonText}
+            </button>
+            <button
+              onClick={onSecondaryClick}
+              className="bg-transparent hover:bg-white hover:text-gray-900 text-white border-2 border-white px-8 py-3 rounded-lg text-lg font-semibold transition-all duration-300"
+            >
+              {secondaryButtonText}
+            </button>
           </div>
         </div>
       </div>
     </section>
   );
-};
+}

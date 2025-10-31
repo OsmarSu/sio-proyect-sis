@@ -28,14 +28,20 @@ export const Navigation = ({
               <a 
                 key={item.href}
                 href={item.href}
-                className="text-gray-600 hover:text-indigo-600 transition-colors"
+                className="text-gray-600 hover:text-indigo-600 transition-colors font-medium"
               >
                 {item.label}
               </a>
             ))}
           </nav>
           
+          {/* Botones opcionales de login/registro */}
           <div className="flex items-center space-x-4">
+            <Link href="/cliente/catalogo">
+              <Button variant="primary" size="sm">
+                Ver Catálogo
+              </Button>
+            </Link>
             <Link href="/login">
               <Button variant="outline" size="sm">
                 Iniciar Sesión
