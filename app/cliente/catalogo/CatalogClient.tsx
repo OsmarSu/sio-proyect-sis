@@ -2,13 +2,12 @@
 import Link from 'next/link';
 
 // Definición de las propiedades que el componente espera
-export interface ProductCardProps {
-  id: string;
+interface ProductCardProps {
+  id: string; // <-- ¡AÑADIDO Y CORREGIDO!
   name: string;
   description: string;
   price: number;
   image?: string;
-  category?: string; // <-- ¡AÑADIDO AQUÍ!
   emoji?: string;
   className?: string;
   originalPrice?: number;
@@ -19,11 +18,23 @@ export interface ProductCardProps {
   isOnSale?: boolean;
 }
 
-export const ProductCard = (props: ProductCardProps) => {
-  // Ahora sí podemos extraer 'category' sin problemas
-  const { id, name, description, price, image, category, isNew, ageRange, rating, stock, originalPrice, isOnSale, emoji = '🎁', className = '' } = props;
-
+export const ProductCard = ({
+  id, // <-- ¡AHORA RECIBIMOS EL ID!
+  name,
+  description,
+  price,
+  image,
+  emoji = '🎁',
+  className = '',
+  originalPrice,
+  ageRange,
+  rating,
+  stock,
+  isNew,
+  isOnSale
+}: ProductCardProps) => {
   return (
+    // Usamos un Link para que toda la tarjeta sea clickeable y lleve al detalle del producto
     <Link href={`/producto/${id}`} className={`bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow flex flex-col ${className}`}>
       <div className="relative">
         <div className="bg-gray-100 rounded-lg h-48 mb-4 flex items-center justify-center overflow-hidden">
@@ -41,16 +52,15 @@ export const ProductCard = (props: ProductCardProps) => {
       </div>
       
       <div className="flex flex-col flex-grow">
-        {category && <p className="text-sm text-gray-500 mb-1">{category}</p>}
         <h3 className="font-semibold text-lg mb-2 text-gray-900 line-clamp-2 flex-grow">{name}</h3>
         <p className="text-gray-600 text-sm mb-3 line-clamp-2">{description}</p>
         
-        <div className="flex items-center justify-between mb-3 text-sm">
-          {ageRange && <span className="text-gray-500">{ageRange}</span>}
+        <div className="flex items-center justify-between mb-3">
+          {ageRange && <span className="text-gray-500 text-sm">{ageRange}</span>}
           {rating && (
             <div className="flex items-center">
               <span className="text-yellow-400">★</span>
-              <span className="text-gray-600 ml-1">{rating}</span>
+              <span className="text-sm text-gray-600 ml-1">{rating}</span>
             </div>
           )}
         </div>
@@ -73,3 +83,4 @@ export const ProductCard = (props: ProductCardProps) => {
     </Link>
   );
 };
+export default ProductCard;

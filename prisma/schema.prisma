@@ -18,7 +18,7 @@ model User {
   email     String   @unique
   name      String?
   password  String?  // Hasheado con bcrypt
-  role      Role     @default(CLIENTE)
+  role      String     @default("CLIENTE")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -73,8 +73,3 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-enum Role {
-  CLIENTE
-  EMPLEADO
-  ADMIN
-}

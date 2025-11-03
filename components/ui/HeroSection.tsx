@@ -4,9 +4,11 @@ interface HeroSectionProps {
   subtitle: string;
   primaryButtonText: string;
   secondaryButtonText: string;
-  onPrimaryClick: () => void;
-  onSecondaryClick: () => void;
-  backgroundImage?: string;
+  backgroundImage?: string; // <-- AÑADIDA AQUÍ
+  onPrimaryClick?: () => void;
+  onSecondaryClick?: () => void;
+  primaryButtonHref?: string;
+  secondaryButtonHref?: string;
 }
 
 export default function HeroSection({
