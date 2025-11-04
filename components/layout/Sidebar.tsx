@@ -62,16 +62,26 @@ const Sidebar = () => {
     >
       {/* Logo y Toggle */}
       <div className="p-6 flex items-center justify-between border-b border-gray-200">
-        {!isCollapsed && (
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
-              <span className="text-white font-bold text-lg">O</span>
-            </div>
+        {!isCollapsed ? (
+          <Link href="/" className="flex items-center gap-3 group">
+            <img 
+              src="/LOGO OASIS.png" 
+              alt="Oasis Store Logo" 
+              className="h-10 w-10 rounded-full object-cover transform group-hover:scale-110 transition-transform duration-300"
+            />
             <div>
               <span className="text-gray-800 font-bold text-lg block">OASIS</span>
               <span className="text-xs text-gray-500">Panel Admin</span>
             </div>
-          </div>
+          </Link>
+        ) : (
+          <Link href="/" className="mx-auto">
+            <img 
+              src="/LOGO OASIS.png" 
+              alt="Oasis Store Logo" 
+              className="h-10 w-10 rounded-full object-cover transform hover:scale-110 transition-transform duration-300"
+            />
+          </Link>
         )}
         
         <button
@@ -141,7 +151,7 @@ const Sidebar = () => {
         <div className="border-t border-gray-200" />
       </div>
 
-      {/* Sección de acciones rápidas */}
+      {/* Sección de accesos rápidos */}
       {!isCollapsed && (
         <div className="p-4 space-y-2">
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-2">

@@ -1,3 +1,5 @@
+'use client';
+
 export default function Footer() {
   return (
     <footer className="bg-gray-800 text-white py-12">
@@ -11,7 +13,7 @@ export default function Footer() {
             </div>
             <p className="text-gray-300 mb-4 max-w-md">
               Tu tienda de confianza para los mejores juguetes educativos y divertidos. 
-              Creando sonrisas desde 2010.
+              Creando sonrisas desde 2017.
             </p>
             <div className="flex space-x-4">
               <span className="text-2xl">📘</span>
@@ -24,10 +26,10 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Enlaces Rápidos</h3>
             <ul className="space-y-2">
-              <li><a href="#inicio" className="text-gray-300 hover:text-white transition-colors">Inicio</a></li>
-              <li><a href="#productos" className="text-gray-300 hover:text-white transition-colors">Productos</a></li>
-              <li><a href="#nosotros" className="text-gray-300 hover:text-white transition-colors">Nosotros</a></li>
-              <li><a href="#contacto" className="text-gray-300 hover:text-white transition-colors">Contacto</a></li>
+              <li><a href="/" className="text-gray-300 hover:text-white transition-colors">Inicio</a></li>
+              <li><a href="/cliente/catalogo" className="text-gray-300 hover:text-white transition-colors">Productos</a></li>
+              <li><a href="/#nosotros" className="text-gray-300 hover:text-white transition-colors">Nosotros</a></li>
+              <li><a href="/#contacto" className="text-gray-300 hover:text-white transition-colors">Contacto</a></li>
             </ul>
           </div>
 
@@ -35,10 +37,18 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Contacto</h3>
             <ul className="space-y-2 text-gray-300">
-              <li>📞 +1 (555) 123-4567</li>
-              <li>✉️ info@jugueteriasio.com</li>
-              <li>📍 Av. Principal 123, Ciudad</li>
-              <li>🕒 Lun-Vie: 9:00-18:00</li>
+              <li className="flex items-start gap-2">
+                <span>📞</span>
+                <span>76535535</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span>📍</span>
+                <span>Entre calle Isabela Católica y La Guardia #235, Santa Cruz, Bolivia</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span>🕒</span>
+                <span>Lun-Vie: 9:00-18:00</span>
+              </li>
             </ul>
           </div>
         </div>

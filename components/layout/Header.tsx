@@ -37,8 +37,23 @@ export default function Header() {
     { name: 'Inicio', href: '/' },
     { name: 'Catálogo', href: '/cliente/catalogo' },
     { name: 'Nosotros', href: '/#nosotros' },
-    { name: 'Contacto', href: '/#contacto' },
+    { name: 'Contacto', href: '/' }, // Manejado con onClick
   ];
+
+  const handleContactClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    
+    // Si estamos en la home, hacer scroll al footer
+    if (pathname === '/') {
+      const footer = document.querySelector('footer');
+      if (footer) {
+        footer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } else {
+      // Si estamos en otra página, ir a home y luego scroll
+      window.location.href = '/#contacto';
+    }
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
@@ -84,7 +99,7 @@ export default function Header() {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                     </svg>
-                    Dashboard
+                    Panel de Gestión
                   </Link>
                 )}
 
@@ -168,16 +183,6 @@ export default function Header() {
                 </Link>
               </>
             )}
-
-            {/* Cart Icon */}
-            <button className="relative p-2 text-gray-600 hover:text-blue-600 transition-colors">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-blue-600 text-white text-xs rounded-full flex items-center justify-center">
-                3
-              </span>
-            </button>
           </div>
 
           {/* Mobile menu button */}
@@ -216,7 +221,7 @@ export default function Header() {
                     href="/dashboard"
                     className="block py-2 text-blue-600 font-medium"
                   >
-                    Dashboard
+                    Panel de Gestión
                   </Link>
                 )}
                 <Link href="/perfil" className="block py-2 text-gray-600">
