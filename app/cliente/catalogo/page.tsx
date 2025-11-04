@@ -294,19 +294,20 @@ export default function CatalogoPage() {
 
               {/* Selector de ordenamiento rápido */}
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Ordenar por:</span>
-                <select
-                  value={filters.sortBy}
-                  onChange={(e) => handleFiltersChange({ ...filters, sortBy: e.target.value })}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="name">Nombre</option>
-                  <option value="price-low">Precio: Menor a Mayor</option>
-                  <option value="price-high">Precio: Mayor a Menor</option>
-                  <option value="rating">Mejor Valorados</option>
-                  <option value="newest">Más Nuevos</option>
-                </select>
-              </div>
+              <span className="text-sm text-black font-medium">Ordenar por:</span>
+              <select
+                value={filters.sortBy}
+                onChange={(e) => handleFiltersChange({ ...filters, sortBy: e.target.value })}
+                className="px-3 py-2 border border-black rounded-lg text-sm text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="name">Nombre</option>
+                <option value="price-low">Precio: Menor a Mayor</option>
+                <option value="price-high">Precio: Mayor a Menor</option>
+                <option value="rating">Mejor Valorados</option>
+                <option value="newest">Más Nuevos</option>
+              </select>
+            </div>
+
             </div>
 
             {/* Grid de productos */}
