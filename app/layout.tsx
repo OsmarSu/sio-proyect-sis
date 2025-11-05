@@ -2,7 +2,7 @@
 
 import type { Metadata } from "next";
 // 1. Cambiamos la importación: quitamos Geist y añadimos Inter.
-import { Inter } from "next/font/google"; 
+import { Inter } from "next/font/google";
 import Providers from "@/components/Providers";
 import "./globals.css";
 
@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     // 4. Cambiamos el idioma a español.
-    <html lang="es">
+    <html lang="es" className={inter.className} suppressHydrationWarning>
       {/* 5. Aplicamos la variable de la fuente al body.
           La clase 'font-sans' se configurará en Tailwind para usar esta fuente. */}
       <body

@@ -16,7 +16,7 @@ model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String
-  password  String   // Contraseña hasheada con bcrypt
+  password  String
   role      Role     @default(CLIENTE)
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -24,6 +24,7 @@ model User {
   
   // Relaciones
   sales     Sale[]
+  purchases Purchase[]  // ← AGREGAR ESTA LÍNEA
   
   @@map("users")
 }
@@ -67,7 +68,7 @@ model Product {
   
   // Relaciones
   saleItems    SaleItem[]
-  
+  purchaseItems PurchaseItem[]
   @@map("products")
 }
 
@@ -168,4 +169,70 @@ model Customer {
   updatedAt   DateTime @updatedAt
   
   @@map("customers")
+}
+
+
+// ==========================================
+// MODELO DE COMPRA (NUEVO - Para el módulo de compras)
+// ==========================================
+model Purchase {
+  id             String         @id @default(cuid())
+  purchaseNumber String         @unique  // Ej: COMP-000001
+  
+  // Proveedor
+  supplierId     String
+  supplierName   String         // Guardamos el nombre por si el proveedor se elimina
+  
+  // Usuario que registró la compra
+  userId         String
+  user           User           @relation(fields: [userId], references: [id])
+  
+  // Fechas
+  purchaseDate   DateTime       @default(now())
+  deliveryDate   DateTime?      // Fecha esperada de entrega
+  receivedDate   DateTime?      // Fecha real de recepción
+  
+  // Totales
+  subtotal       Float
+  tax            Float          @default(0)
+  total          Float
+  
+  // Estado
+  status         PurchaseStatus @default(PENDIENTE)
+  
+  // Notas
+  notes          String?        @db.Text
+  
+  // Items de la compra
+  items          PurchaseItem[]
+  
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  
+  @@map("purchases")
+}
+
+enum PurchaseStatus {
+  PENDIENTE   // Pedido realizado, esperando recepción
+  RECIBIDA    // Mercadería recibida, stock actualizado
+  CANCELADA   // Compra cancelada
+}
+
+// ==========================================
+// ITEMS DE COMPRA (Detalle de productos comprados)
+// ==========================================
+model PurchaseItem {
+  id         String   @id @default(cuid())
+  
+  purchaseId String
+  purchase   Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id])
+  
+  quantity   Int      // Cantidad comprada
+  unitCost   Float    // Costo unitario
+  subtotal   Float    // quantity * unitCost
+  
+  @@map("purchase_items")
 }
