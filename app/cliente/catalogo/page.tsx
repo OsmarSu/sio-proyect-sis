@@ -106,7 +106,7 @@ const mockProducts: Product[] = [
   {
     id: 9,
     name: 'Set de Dinosaurios Jurásicos',
-    price: 159.99,
+    price: 150.99,
     category: 'Exteriores',
     ageRange: '3-5 años',
     image: 'https://todojuguete.es/191924/set_6_dinosaurios_con_arboles_jurassic_era.jpg',
