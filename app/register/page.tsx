@@ -71,12 +71,12 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-neutral-950 relative overflow-hidden">
+    <div className="min-h-screen flex bg-gray-50 relative overflow-hidden">
       {/* Fondo con gradiente */}
-      <div className="absolute top-0 z-0 h-full w-full bg-neutral-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]" />
+      <div className="absolute top-0 z-0 h-full w-full bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50" />
       
       {/* Lado izquierdo - Info (se queda igual) */}
-      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-purple-600/20 to-pink-600/20 backdrop-blur-xl items-center justify-center p-12 relative z-10 border-r border-neutral-800">
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-purple-100 to-pink-100 items-center justify-center p-12 relative z-10 border-r border-gray-200">
         <div className="max-w-md">
           <div className="mb-8">
             <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 animate-pulse">
@@ -86,8 +86,8 @@ export default function RegisterPage() {
             </div>
           </div>
           
-          <h2 className="text-4xl font-bold text-white mb-4">Únete a Oasis</h2>
-          <p className="text-gray-300 text-lg mb-8">Crea tu cuenta y comienza a gestionar tu juguetería de manera profesional.</p>
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">Únete a Oasis</h2>
+          <p className="text-gray-700 text-lg mb-8">Crea tu cuenta y comienza a gestionar tu juguetería de manera profesional.</p>
           
           <div className="space-y-4">
             {/* ... (tus características de marketing se quedan igual) ... */}
@@ -103,34 +103,34 @@ export default function RegisterPage() {
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
               <span className="text-white font-bold text-xl">O</span>
             </div>
-            <span className="text-white font-bold text-2xl">OASIS</span>
+            <span className="text-gray-900 font-bold text-2xl">OASIS</span>
           </div>
 
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-white mb-2">Crear Cuenta</h1>
-            <p className="text-gray-400 text-lg">Completa el formulario para comenzar</p>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">Crear Cuenta</h1>
+            <p className="text-gray-600 text-lg">Completa el formulario para comenzar</p>
           </div>
 
           {/* Formulario */}
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Nombre */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">Nombre Completo</label>
-              <input id="name" name="name" type="text" value={formData.name} onChange={handleChange} className="w-full px-4 py-3 bg-neutral-900/50 border border-neutral-800 rounded-lg text-white ..." placeholder="Juan Pérez" required />
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">Nombre Completo</label>
+              <input id="name" name="name" type="text" value={formData.name} onChange={handleChange} className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="Juan Pérez" required />
             </div>
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">Correo Electrónico</label>
-              <input id="email" name="email" type="email" value={formData.email} onChange={handleChange} className="w-full px-4 py-3 bg-neutral-900/50 border border-neutral-800 rounded-lg text-white ..." placeholder="tu@email.com" required />
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
+              <input id="email" name="email" type="email" value={formData.email} onChange={handleChange} className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="tu@email.com" required />
             </div>
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">Contraseña</label>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
               <div className="relative">
-                <input id="password" name="password" type={showPassword ? 'text' : 'password'} value={formData.password} onChange={handleChange} className="w-full px-4 py-3 bg-neutral-900/50 border border-neutral-800 rounded-lg text-white ..." placeholder="••••••••" required />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300">
+                <input id="password" name="password" type={showPassword ? 'text' : 'password'} value={formData.password} onChange={handleChange} className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="••••••••" required />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
                   {/* ... (tu icono de ojo) ... */}
                 </button>
               </div>
@@ -138,10 +138,10 @@ export default function RegisterPage() {
 
             {/* Confirmar Password */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2">Confirmar Contraseña</label>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">Confirmar Contraseña</label>
               <div className="relative">
-                <input id="confirmPassword" name="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} value={formData.confirmPassword} onChange={handleChange} className="w-full px-4 py-3 bg-neutral-900/50 border border-neutral-800 rounded-lg text-white ..." placeholder="••••••••" required />
-                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300">
+                <input id="confirmPassword" name="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} value={formData.confirmPassword} onChange={handleChange} className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="••••••••" required />
+                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
                   {/* ... (tu icono de ojo) ... */}
                 </button>
               </div>
@@ -149,8 +149,8 @@ export default function RegisterPage() {
 
             {/* Términos */}
             <label className="flex items-start gap-2 cursor-pointer">
-              <input type="checkbox" id="acceptTerms" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} className="w-4 h-4 mt-1 rounded border-neutral-700 bg-neutral-900 text-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-offset-0" />
-              <span className="text-sm text-gray-300">
+              <input type="checkbox" id="acceptTerms" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} className="w-4 h-4 mt-1 rounded border-gray-300 bg-white text-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-offset-0" />
+              <span className="text-sm text-gray-700">
                 Acepto los{' '}
                 <Link href="/terms" className="text-purple-400 hover:text-purple-300">términos y condiciones</Link>
                 {' '}y la{' '}
@@ -176,7 +176,7 @@ export default function RegisterPage() {
           </form>
 
           {/* Login */}
-          <p className="mt-6 text-center text-gray-400">
+          <p className="mt-6 text-center text-gray-600">
             ¿Ya tienes cuenta?{' '}
             <Link href="/login" className="text-purple-400 hover:text-purple-300 font-semibold transition-colors">
               Inicia sesión

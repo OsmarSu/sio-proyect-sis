@@ -6,24 +6,25 @@ import { FiPhone, FiMapPin, FiClock } from 'react-icons/fi';
 export default function Footer() {
   return (
     <footer id="contacto" className="bg-neutral-950 text-white py-12">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 ">
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           
-          <div className="col-span-1 md:col-span-2">
+          {/* Información de la empresa */}
+          <div className="lg:col-span-1">
             <a href="#inicio" className="inline-block mb-4">
               <div className="flex items-center">
                 <span className="text-2xl font-bold text-blue-400">Juguetería</span>
                 <span className="text-2xl font-bold text-white">OASIS</span>
               </div>
             </a>
-            <p className="text-gray-300 mb-6 max-w-md">
+            <p className="text-gray-300 mb-6">
               Tu tienda de confianza para los mejores juguetes educativos y divertidos. 
               Creando sonrisas desde 2017.
             </p>
             <div className="flex space-x-5">
               <a 
-                href="https_tu_facebook.com" 
+                href="https://facebook.com" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 aria-label="Facebook"
@@ -32,7 +33,7 @@ export default function Footer() {
                 <FaFacebook size={24} />
               </a>
               <a 
-                href="https_tu_instagram.com" 
+                href="https://instagram.com" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 aria-label="Instagram"
@@ -41,7 +42,7 @@ export default function Footer() {
                 <FaInstagram size={24} />
               </a>
               <a 
-                href="https_tu_twitter.com" 
+                href="https://twitter.com" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 aria-label="Twitter"
@@ -50,7 +51,7 @@ export default function Footer() {
                 <FaTwitter size={24} />
               </a>
               <a 
-                href="https_tu_whatsapp.com" 
+                href="https://wa.me/59176535535" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 aria-label="WhatsApp"
@@ -61,6 +62,18 @@ export default function Footer() {
             </div>
           </div>
 
+          {/* Enlaces rápidos */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Enlaces Rápidos</h3>
+            <ul className="space-y-2">
+              <li><a href="/" className="text-gray-300 hover:text-white transition-colors">Inicio</a></li>
+              <li><a href="/cliente/catalogo" className="text-gray-300 hover:text-white transition-colors">Productos</a></li>
+              <li><a href="/#nosotros" className="text-gray-300 hover:text-white transition-colors">Nosotros</a></li>
+              <li><a href="/#contacto" className="text-gray-300 hover:text-white transition-colors">Contacto</a></li>
+            </ul>
+          </div>
+
+          {/* Contacto */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Contacto</h3>
             <ul className="space-y-4 text-gray-300">
@@ -77,6 +90,23 @@ export default function Footer() {
                 <span>Lun-Vie: 9:00-18:00</span>
               </li>
             </ul>
+          </div>
+
+          {/* Mapa de ubicación */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Nuestra Ubicación</h3>
+            <div className="rounded-lg overflow-hidden shadow-lg">
+              <iframe 
+                src="https://www.google.com/maps/embed?pb=!4v1762392301977!6m8!1m7!1sdwwhBN5o8pk72pzDhJZfGw!2m2!1d-17.79561119236609!2d-63.1928588741025!3f89.62877244900278!4f-13.585616537274234!5f0.7820865974627469" 
+                width="250" 
+                height="250" 
+                style={{border:0}} 
+                allowFullScreen={true}
+                loading="lazy" 
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Ubicación Juguetería Oasis"
+              />
+            </div>
           </div>
         </div>
         

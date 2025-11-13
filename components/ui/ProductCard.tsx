@@ -77,14 +77,14 @@ export const ProductCard = ({
               <span>{ageRange}</span>
             </div>
           )}
-          {rating && (
+          {/*rating && (
             <div className="flex items-center gap-1">
               <svg className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
                 <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
               </svg>
               <span className="text-sm font-semibold text-gray-700">{rating}</span>
             </div>
-          )}
+          )*/}
         </div>
         
         {/* Precio y botón */}
@@ -119,7 +119,7 @@ export const ProductCard = ({
             </div>
           )}
           
-          <button 
+          {/*<button 
             disabled={stock === 0}
             className={`w-full py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${
               stock === 0
@@ -131,7 +131,7 @@ export const ProductCard = ({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
             {stock === 0 ? 'Agotado' : 'Agregar al Carrito'}
-          </button>
+          </button>*/}
         </div>
       </div>
     </div>

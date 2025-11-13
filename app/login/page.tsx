@@ -32,9 +32,9 @@ export default function LoginPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex-1 flex items-center justify-center bg-neutral-950 relative overflow-hidden pt-16">
+      <main className="flex-1 flex items-center justify-center bg-gray-50 relative overflow-hidden pt-16">
 
-        <div className="absolute top-0 left-0 z-0 h-full w-full bg-neutral-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]" />
+        <div className="absolute top-0 left-0 z-0 h-full w-full bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50" />
 
         <div className="w-full max-w-md relative z-10 px-8 py-12">
           
@@ -49,13 +49,13 @@ export default function LoginPage() {
                 className="rounded-full object-cover" 
                 priority
               />
-              <span className="text-white font-bold text-2xl">Oasis Store</span> 
+              <span className="text-gray-900 font-bold text-2xl">Oasis Store</span>
             </div>
             <div>
-              <h1 className="text-4xl font-bold text-white mb-2 text-center">
+              <h1 className="text-4xl font-bold text-gray-900 mb-2 text-center">
                 Bienvenido de vuelta
               </h1>
-              <p className="text-gray-400 text-lg text-center">
+              <p className="text-gray-600 text-lg text-center">
                 Ingresa tus credenciales para continuar
               </p>
             </div>
@@ -65,7 +65,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-300 mb-2"
+                className="block text-sm font-medium text-gray-700 mb-2"
               >
                 Correo Electrónico
               </label>
@@ -74,7 +74,7 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-neutral-900/50 border border-neutral-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="tu@email.com"
                 required
               />
@@ -83,7 +83,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-300 mb-2"
+                className="block text-sm font-medium text-gray-700 mb-2"
               >
                 Contraseña
               </label>
@@ -93,14 +93,14 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 bg-neutral-900/50 border border-neutral-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   placeholder="••••••••"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
                   {showPassword ? (
                     <svg
@@ -151,16 +151,11 @@ export default function LoginPage() {
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  className="w-4 h-4 rounded border-neutral-700 bg-neutral-900 text-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0"
+                  className="w-4 h-4 rounded border-gray-300 bg-white text-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0"
                 />
-                <span className="text-sm text-gray-300">Recordarme</span>
+                <span className="text-sm text-gray-700">Recordarme</span>
               </label>
-              <Link
-                href="/forgot-password"
-                className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
-              >
-                ¿Olvidaste tu contraseña?
-              </Link>
+              
             </div>
 
             <button
@@ -172,7 +167,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-gray-400">
+          <p className="mt-6 text-center text-gray-600">
             ¿No tienes cuenta?{" "}
             <Link
               href="/register"
