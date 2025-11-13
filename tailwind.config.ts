@@ -1,5 +1,5 @@
 import type { Config } from "tailwindcss";
-
+const { fontFamily } = require("tailwindcss/defaultTheme");
 const config: Config = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter)", "sans-serif"],
+        sans: ["var(--font-nunito)", ...fontFamily.sans],
       },
     },
   },
