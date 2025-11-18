@@ -2,6 +2,7 @@
 
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import Image from 'next/image';
 import HeroSection from '../components/ui/HeroSection';
 
 export default function LandingPage() {
@@ -196,7 +197,7 @@ export default function LandingPage() {
                 >
                   <div className="relative">
                     <div className="bg-gray-100 h-48 overflow-hidden">
-                      <img
+                      <Image
                         src={product.image}
                         alt={product.name}
                         className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"

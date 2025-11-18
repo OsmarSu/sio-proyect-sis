@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { FaFacebook, FaInstagram, FaTwitter, FaWhatsapp } from 'react-icons/fa';
 import { FiPhone, FiMapPin, FiClock } from 'react-icons/fi';
 
@@ -35,10 +36,10 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4 text-cyan-300">Enlaces Rápidos</h3>
             <ul className="space-y-2">
-              <li><a href="/" className="text-blue-100 hover:text-white transition-colors">Inicio</a></li>
-              <li><a href="/cliente/catalogo" className="text-blue-100 hover:text-white transition-colors">Productos</a></li>
-              <li><a href="/#nosotros" className="text-blue-100 hover:text-white transition-colors">Nosotros</a></li>
-              <li><a href="/#contacto" className="text-blue-100 hover:text-white transition-colors">Contacto</a></li>
+              <li><Link href="/" className="text-blue-100 hover:text-white transition-colors">Inicio</Link></li>
+              <li><Link href="/cliente/catalogo" className="text-blue-100 hover:text-white transition-colors">Productos</Link></li>
+              <li><Link href="/#nosotros" className="text-blue-100 hover:text-white transition-colors">Nosotros</Link></li>
+              <li><Link href="/#contacto" className="text-blue-100 hover:text-white transition-colors">Contacto</Link></li>
             </ul>
           </div>
 
