@@ -52,18 +52,25 @@ export default function LandingPage() {
       <Header />
       
       <main className="md:mt-16">
-        {/* Hero Section */}
-        <HeroSection
-          title="Descubre la Magia del Juego"
-          subtitle="Los mejores juguetes educativos y divertidos para todas las edades"
-          primaryButtonText="Explorar Catálogo"
-          secondaryButtonText="Ver Ofertas"
-          onPrimaryClick={handleExploreProducts}
-          onSecondaryClick={handleExploreProducts}
-        />
+        {/* Hero Section - SECCIÓN 1 (sin cambio de fondo, pero texto con sombra) */}
+        <div className="hero-section-wrapper">
+          <style jsx>{`
+            .hero-section-wrapper :global(.hero-text) {
+              text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+            }
+          `}</style>
+          <HeroSection
+            title="Descubre la Magia del Juego"
+            subtitle="Los mejores juguetes educativos y divertidos para todas las edades"
+            primaryButtonText="Explorar Catálogo"
+            secondaryButtonText="Ver Ofertas"
+            onPrimaryClick={handleExploreProducts}
+            onSecondaryClick={handleExploreProducts}
+          />
+        </div>
 
-        {/* Features Section - Renovada */}
-        <section id="nosotros" className="py-16 bg-white">
+        {/* Features Section - SECCIÓN 2 - Fondo Rosa Suave */}
+        <section id="nosotros" className="py-16 bg-gradient-to-br from-rose-100 via-pink-100 to-rose-200">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-bold text-gray-800 mb-4">
@@ -78,7 +85,7 @@ export default function LandingPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Ventas por Mayor y Menor */}
-              <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-8 border border-blue-100 hover:shadow-lg transition-shadow">
+              <div className="bg-white rounded-xl p-8 border border-blue-100 hover:shadow-lg transition-shadow">
                 <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl mb-6 mx-auto">
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -94,7 +101,7 @@ export default function LandingPage() {
               </div>
 
               {/* Pagos Fácil y Seguro */}
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-8 border border-green-100 hover:shadow-lg transition-shadow">
+              <div className="bg-white rounded-xl p-8 border border-green-100 hover:shadow-lg transition-shadow">
                 <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-600 to-emerald-600 rounded-2xl mb-6 mx-auto">
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
@@ -110,7 +117,7 @@ export default function LandingPage() {
               </div>
 
               {/* Envíos para Mayoristas */}
-              <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-8 border border-orange-100 hover:shadow-lg transition-shadow">
+              <div className="bg-white rounded-xl p-8 border border-orange-100 hover:shadow-lg transition-shadow">
                 <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-600 to-amber-600 rounded-2xl mb-6 mx-auto">
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -127,10 +134,10 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Visión y Misión */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16">
+            {/* Visión y Misión - SECCIÓN 3 - Fondo Verde-Celeste Suave */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16 p-8 rounded-3xl bg-gradient-to-br from-cyan-50 via-teal-50 to-cyan-100">
               {/* Visión */}
-              <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-8 border border-blue-100">
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-8 border border-blue-200 shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,7 +156,7 @@ export default function LandingPage() {
               </div>
 
               {/* Misión */}
-              <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-xl p-8 border border-green-100">
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-8 border border-green-200 shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-blue-600 rounded-xl flex items-center justify-center">
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -171,8 +178,8 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Featured Products */}
-        <section className="py-16 bg-gray-50">
+        {/* Featured Products - SECCIÓN 4 - Fondo Verde Suave */}
+        <section className="py-16 bg-gradient-to-br from-green-100 via-lime-100 to-green-200">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-bold text-gray-800 mb-4">Productos Destacados</h2>

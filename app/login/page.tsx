@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image"; // <-- Importa Image
+import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
@@ -29,6 +29,13 @@ export default function LoginPage() {
     }
   };
 
+  // Nueva función para limpiar los campos
+  const handleClear = () => {
+    setEmail("");
+    setPassword("");
+    setError(null);
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -40,16 +47,15 @@ export default function LoginPage() {
           
           <div className="flex flex-col items-center mb-8">
             <div className="flex items-center gap-3 mb-4">
-             
               <Image
                 src="/sis_oasis.png" 
-                alt="Oasis"
+                alt="SIO"
                 width={56} 
                 height={56}
                 className="rounded-full object-cover" 
                 priority
               />
-              <span className="text-gray-900 font-bold text-2xl">Oasis Store</span>
+              <span className="text-gray-900 font-bold text-2xl">SIO</span>
             </div>
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-2 text-center">
@@ -155,16 +161,26 @@ export default function LoginPage() {
                 />
                 <span className="text-sm text-gray-700">Recordarme</span>
               </label>
-              
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? "Iniciando..." : "Iniciar Sesión"}
-            </button>
+            {/* Botones de Iniciar Sesión y Limpiar */}
+            <div className="flex gap-3">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="flex-1 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? "Iniciando..." : "Iniciar Sesión"}
+              </button>
+              
+              <button
+                type="button"
+                onClick={handleClear}
+                className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-all duration-300 transform hover:scale-[1.02]"
+              >
+                Limpiar
+              </button>
+            </div>
           </form>
 
           <p className="mt-6 text-center text-gray-600">

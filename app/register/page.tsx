@@ -3,14 +3,15 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useAuth } from '@/contexts/AuthContext'; // 1. IMPORTAMOS EL HOOK DE AUTENTICACIÓN
-import { useRouter } from 'next/navigation'; // Necesitamos useRouter para redirigir
+import Footer from "@/components/layout/Footer";
+import Header from "@/components/layout/Header";
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
-  const { register } = useAuth(); // 2. OBTENEMOS LA FUNCIÓN 'register' DEL CONTEXTO
-  const router = useRouter(); // Instanciamos el router
+  const { register } = useAuth();
+  const router = useRouter();
 
-  // Tu estado formData original
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -18,16 +19,12 @@ export default function RegisterPage() {
     confirmPassword: '',
   });
   
-  // Tus estados para mostrar/ocultar contraseña
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  // Nuevos estados para errores y carga
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [acceptTerms, setAcceptTerms] = useState(false); // Para el checkbox de términos
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
-  // Tu función handleChange original
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -35,13 +32,11 @@ export default function RegisterPage() {
     });
   };
 
-  // 3. ¡ESTA ES LA FUNCIÓN handleSubmit CORREGIDA Y COMPLETA!
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // Evita que la página se recargue
-    setError(null); // Limpiamos errores anteriores
-    setIsLoading(true); // Activamos el estado de carga
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
 
-    // Validaciones del frontend antes de enviar
     if (formData.password !== formData.confirmPassword) {
       setError('Las contraseñas no coinciden.');
       setIsLoading(false);
@@ -55,27 +50,19 @@ export default function RegisterPage() {
     }
 
     try {
-      // Llamamos a la función 'register' de tu AuthContext.
-      // Esta función se encargará de llamar a la API y el login automático.
       await register(formData.email, formData.password, formData.name);
-      
-      // Si el registro y el login fueron exitosos (manejado en AuthContext),
-      // AuthContext.login ya redirige al usuario. No necesitamos un router.push aquí.
-
     } catch (err: any) {
-      // Si la función 'register' falla (ej. email ya registrado, contraseña débil), mostrará un error.
       setError(err.message || 'Error al registrarse. Inténtalo de nuevo.');
     } finally {
-      setIsLoading(false); // Desactivamos el estado de carga
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex bg-gray-50 relative overflow-hidden">
-      {/* Fondo con gradiente */}
+     
       <div className="absolute top-0 z-0 h-full w-full bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50" />
-      
-      {/* Lado izquierdo - Info (se queda igual) */}
+      {/* Lado izquierdo - Info */}
       <div className="hidden lg:flex flex-1 bg-gradient-to-br from-purple-100 to-pink-100 items-center justify-center p-12 relative z-10 border-r border-gray-200">
         <div className="max-w-md">
           <div className="mb-8">
@@ -86,11 +73,45 @@ export default function RegisterPage() {
             </div>
           </div>
           
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">Únete a Oasis</h2>
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">Únete a SIO</h2>
           <p className="text-gray-700 text-lg mb-8">Crea tu cuenta y comienza a gestionar tu juguetería de manera profesional.</p>
           
           <div className="space-y-4">
-            {/* ... (tus características de marketing se quedan igual) ... */}
+            <div className="flex items-start gap-3">
+              <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-1">Gestión Completa</h3>
+                <p className="text-gray-700 text-sm">Administra tu inventario, ventas y clientes en un solo lugar.</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start gap-3">
+              <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-1">Reportes en Tiempo Real</h3>
+                <p className="text-gray-700 text-sm">Visualiza estadísticas y reportes detallados de tu negocio.</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start gap-3">
+              <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-1">Seguridad Garantizada</h3>
+                <p className="text-gray-700 text-sm">Tus datos están protegidos con encriptación de última generación.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -101,9 +122,9 @@ export default function RegisterPage() {
           {/* Logo y Título */}
           <div className="flex items-center gap-3 mb-8">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-xl">O</span>
+              <span className="text-white font-bold text-xl">S</span>
             </div>
-            <span className="text-gray-900 font-bold text-2xl">OASIS</span>
+            <span className="text-gray-900 font-bold text-2xl">SIO</span>
           </div>
 
           <div className="mb-8">
@@ -131,7 +152,16 @@ export default function RegisterPage() {
               <div className="relative">
                 <input id="password" name="password" type={showPassword ? 'text' : 'password'} value={formData.password} onChange={handleChange} className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="••••••••" required />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
-                  {/* ... (tu icono de ojo) ... */}
+                  {showPassword ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    </svg>
+                  )}
                 </button>
               </div>
             </div>
@@ -142,7 +172,16 @@ export default function RegisterPage() {
               <div className="relative">
                 <input id="confirmPassword" name="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} value={formData.confirmPassword} onChange={handleChange} className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="••••••••" required />
                 <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
-                  {/* ... (tu icono de ojo) ... */}
+                  {showConfirmPassword ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    </svg>
+                  )}
                 </button>
               </div>
             </div>
@@ -184,6 +223,8 @@ export default function RegisterPage() {
           </p>
         </div>
       </div>
+      
     </div>
+    
   );
 }
