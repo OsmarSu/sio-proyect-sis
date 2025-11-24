@@ -1,7 +1,7 @@
 // app/dashboard/reportes/layout.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { TrendingUp, Download, Calendar, Filter } from 'lucide-react';
@@ -11,7 +11,7 @@ const COLOR_PRIMARY = '#5556EE';
 const COLOR_SECONDARY = '#8150CE';
 const COLOR_SUCCESS = '#74AB41';
 
-export default function ReportsLayout({ children }: { children: React.ReactNode }) {
+function ReportsLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -178,5 +178,13 @@ export default function ReportsLayout({ children }: { children: React.ReactNode 
         {children}
       </div>
     </div>
+  );
+}
+
+export default function ReportsLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<div>Cargando panel de reportes...</div>}>
+      <ReportsLayoutContent>{children}</ReportsLayoutContent>
+    </Suspense>
   );
 }

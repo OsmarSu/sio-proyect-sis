@@ -1,7 +1,7 @@
 // app/dashboard/reportes/inventario/page.tsx
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Package, AlertCircle } from 'lucide-react';
@@ -11,7 +11,8 @@ const PRIMARY_COLOR = '#5556EE';
 const DANGER_COLOR = '#DE6415';
 const ACCENT_COLOR = '#2EB4D1';
 export const dynamic = 'force-dynamic';
-function InventarioReportPage() {
+
+function InventarioReportContent() {
   const searchParams = useSearchParams();
   const dateRange = searchParams.get('range') || 'month';
 
@@ -80,6 +81,14 @@ function InventarioReportPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function InventarioReportPage() {
+  return (
+    <Suspense fallback={<div>Cargando reporte de inventario...</div>}>
+      <InventarioReportContent />
+    </Suspense>
   );
 }
 

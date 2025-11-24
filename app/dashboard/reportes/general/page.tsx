@@ -1,13 +1,14 @@
 // app/dashboard/reportes/general/page.tsx
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, TrendingDown, DollarSign, Package, Users, ShoppingCart } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
-function GeneralReportPage() {
+
+function GeneralReportContent() {
     const searchParams = useSearchParams();
     const dateRange = searchParams.get('range') || 'month';
 
@@ -25,7 +26,7 @@ function GeneralReportPage() {
         { mes: 'Mar', ventas: 48932, productos: 245 },
         { mes: 'Abr', ventas: 61245, productos: 312 },
         { mes: 'May', ventas: 58679, productos: 298 },
-        { mes: 'Jun', ventas: 67432, productos: 341 }
+        { mes: 'Jun', ventas: 67432, productos: 341 },
     ];
 
     const ventasPorCategoria = [
@@ -33,7 +34,7 @@ function GeneralReportPage() {
         { categoria: 'Muñecas', valor: 25, monto: 48210 },
         { categoria: 'Deportes', valor: 20, monto: 38567 },
         { categoria: 'Juegos', valor: 15, monto: 28934 },
-        { categoria: 'Otros', valor: 5, monto: 9634 }
+        { categoria: 'Otros', valor: 5, monto: 9634 },
     ];
 
     const PIE_CHART_COLORS = [PRIMARY_COLOR, SECONDARY_COLOR, DANGER_COLOR, SUCCESS_COLOR, ACCENT_COLOR];
@@ -45,8 +46,8 @@ function GeneralReportPage() {
             cambio: '+23%',
             icon: DollarSign,
             bgColorClass: 'bg-oasis-success-light', // Usar custom color de Tailwind
-            iconColorClass: 'text-oasis-success',   // Usar custom color de Tailwind
-            trend: 'up'
+            iconColorClass: 'text-oasis-success', // Usar custom color de Tailwind
+            trend: 'up',
         },
         {
             titulo: 'Productos Vendidos',
@@ -55,7 +56,7 @@ function GeneralReportPage() {
             icon: Package,
             bgColorClass: 'bg-oasis-primary-light',
             iconColorClass: 'text-oasis-primary',
-            trend: 'up'
+            trend: 'up',
         },
         {
             titulo: 'Clientes Nuevos',
@@ -64,7 +65,7 @@ function GeneralReportPage() {
             icon: Users,
             bgColorClass: 'bg-oasis-secondary-light',
             iconColorClass: 'text-oasis-secondary',
-            trend: 'up'
+            trend: 'up',
         },
         {
             titulo: 'Ticket Promedio',
@@ -73,8 +74,8 @@ function GeneralReportPage() {
             icon: ShoppingCart,
             bgColorClass: 'bg-oasis-danger-light',
             iconColorClass: 'text-oasis-danger',
-            trend: 'down'
-        }
+            trend: 'down',
+        },
     ];
 
     return (
@@ -140,6 +141,14 @@ function GeneralReportPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+function GeneralReportPage() {
+    return (
+        <Suspense fallback={<div>Cargando reporte general...</div>}>
+            <GeneralReportContent />
+        </Suspense>
     );
 }
 

@@ -1,7 +1,7 @@
 // app/dashboard/reportes/clientes/page.tsx
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { Users, Star } from 'lucide-react';
@@ -15,7 +15,7 @@ const SUCCESS_COLOR = '#74AB41';
 
 const PIE_COLORS_CLIENTES = [PRIMARY_COLOR, SECONDARY_COLOR, ACCENT_COLOR, SUCCESS_COLOR];
 
-function ClientesReportPage() {
+function ClientesReportContent() {
   const searchParams = useSearchParams();
   const dateRange = searchParams.get('range') || 'month';
 
@@ -106,6 +106,14 @@ function ClientesReportPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function ClientesReportPage() {
+  return (
+    <Suspense fallback={<div>Cargando reporte de clientes...</div>}>
+      <ClientesReportContent />
+    </Suspense>
   );
 }
 

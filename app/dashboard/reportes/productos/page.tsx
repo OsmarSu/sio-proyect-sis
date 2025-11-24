@@ -1,12 +1,13 @@
 // app/dashboard/reportes/productos/page.tsx
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useSearchParams } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
-const ProductosReportPage = () => {
+
+function ProductosReportContent() {
   const searchParams = useSearchParams();
   const dateRange = searchParams.get('range') || 'month';
 
@@ -20,7 +21,7 @@ const ProductosReportPage = () => {
     { nombre: 'Barbie Edición Especial', cantidad: 132, ingresos: 19800 },
     { nombre: 'Carro RC 4x4', cantidad: 98, ingresos: 17640 },
     { nombre: 'Monopoly Clásico', cantidad: 87, ingresos: 8700 },
-    { nombre: 'Pelota de Fútbol', cantidad: 203, ingresos: 10150 }
+    { nombre: 'Pelota de Fútbol', cantidad: 203, ingresos: 10150 },
   ];
 
   return (
@@ -74,6 +75,14 @@ const ProductosReportPage = () => {
         </div>
       </div>
     </div>
+  );
+}
+
+const ProductosReportPage = () => {
+  return (
+    <Suspense fallback={<div>Cargando reporte de productos...</div>}>
+      <ProductosReportContent />
+    </Suspense>
   );
 };
 
