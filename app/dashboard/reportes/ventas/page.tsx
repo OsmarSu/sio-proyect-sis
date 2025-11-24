@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { DollarSign } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
 // Colores de tu paleta (referencia)
 const PRIMARY_COLOR = '#5556EE';
 const SUCCESS_COLOR = '#74AB41';

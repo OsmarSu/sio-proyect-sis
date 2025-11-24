@@ -10,7 +10,7 @@ import { Package, AlertCircle } from 'lucide-react';
 const PRIMARY_COLOR = '#5556EE';
 const DANGER_COLOR = '#DE6415';
 const ACCENT_COLOR = '#2EB4D1';
-
+export const dynamic = 'force-dynamic';
 function InventarioReportPage() {
   const searchParams = useSearchParams();
   const dateRange = searchParams.get('range') || 'month';

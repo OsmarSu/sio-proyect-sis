@@ -5,6 +5,7 @@ import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useSearchParams } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
 const ProductosReportPage = () => {
   const searchParams = useSearchParams();
   const dateRange = searchParams.get('range') || 'month';

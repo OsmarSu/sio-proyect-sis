@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { Users, Star } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
 // Colores de tu paleta (referencia)
 const PRIMARY_COLOR = '#5556EE';
 const SECONDARY_COLOR = '#8150CE';

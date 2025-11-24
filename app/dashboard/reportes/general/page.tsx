@@ -6,6 +6,7 @@ import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tool
 import { TrendingUp, TrendingDown, DollarSign, Package, Users, ShoppingCart } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
 function GeneralReportPage() {
     const searchParams = useSearchParams();
     const dateRange = searchParams.get('range') || 'month';
