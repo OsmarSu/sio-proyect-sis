@@ -1,5 +1,5 @@
 // app/page.tsx
-
+"use client"; // <--- ¡LA SOLUCIÓN!
 import Link from 'next/link';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
@@ -13,7 +13,7 @@ export default function LandingPage() {
   // Datos mock para la landing
   const featuredProducts = [
     {
-      id: 1,
+      id: '1',
       name: 'Lego Classic',
       price: 29.99,
       image: '/api/placeholder/300/300',
@@ -21,21 +21,21 @@ export default function LandingPage() {
       isNew: true
     },
     {
-      id: 2,
+      id: '2',
       name: 'Muñeca Barbie',
       price: 89.99,
       image: '/api/placeholder/300/300',
       category: 'Muñecas'
     },
     {
-      id: 3,
+      id: '3',
       name: 'Pista Hot Wheels',
       price: 45.99,
       image: '/api/placeholder/300/300',
       category: 'Vehículos'
     },
     {
-      id: 4,
+      id: '4',
       name: 'Set de Química',
       price: 34.99,
       image: '/api/placeholder/300/300',
@@ -129,7 +129,6 @@ export default function LandingPage() {
           title="Productos Destacados"
           subtitle="Los juguetes más populares y nuevos de nuestra colección"
           products={featuredProducts}
-          onViewAll={handleViewAllProducts}
         />
 
         {/* Testimonials */}
