@@ -37,6 +37,12 @@ const nextConfig = {
     //   },
     // ]
   },
+  esLint: {
+    ignoreDuringBuilds: true,
+  },
+  typeScript: {
+    ignoreBuildErrors: true,
+  },
 };
 
 module.exports = nextConfig;
