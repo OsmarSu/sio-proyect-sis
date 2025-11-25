@@ -13,7 +13,6 @@ const PUBLIC_PATHS = [
   '/login',
   '/register',
   '/cliente/catalogo',
-  '/dashboard',
 ];
 // si quiren entrar solo agregar '/dashboard', <----
 // Rutas de API públicas

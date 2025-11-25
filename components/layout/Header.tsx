@@ -79,7 +79,7 @@ export default function Header() {
               text-xl font-bold transition-colors duration-300
               ${isDarkPage ? 'text-white' : 'text-gray-800'}
             `}>
-              Oasis Store
+              Juguetería Oasis
             </span>
           </Link>
 
@@ -200,15 +200,15 @@ export default function Header() {
                   </Link>
                 )}
                 
-                {/* Comentado por que no sabemso si lo usaremos */}
-                {/* {pathname !== '/register' && (
+                {/* Register */}
+                {pathname !== '/register' && (
                   <Link 
                     href="/register" 
                     className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/40 whitespace-nowrap"
                   >
                     Registrarse
                   </Link>
-                )} */}
+                )}
               </>
             )}
           </div>

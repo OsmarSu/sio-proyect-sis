@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { FaFacebook, FaInstagram, FaTwitter, FaWhatsapp } from 'react-icons/fa';
 import { FiPhone, FiMapPin, FiClock } from 'react-icons/fi';
+import Image from 'next/image';
 
 export default function Footer() {
   
@@ -21,6 +22,14 @@ export default function Footer() {
                 <span className="text-2xl font-bold text-white">OASIS</span>
               </div>
             </a>
+              <Image 
+                src="/LOGO OASIS.png" // <-- Tu cambio de logo
+                alt="Oasis Store Logo" 
+                width={130}
+                height={130}
+                className="rounded-full object-cover pb-4"
+                priority 
+              />
             <p className="text-blue-100 mb-6">
               Tu tienda de confianza para los mejores juguetes educativos y divertidos. 
               Creando sonrisas desde 2017.
@@ -66,7 +75,7 @@ export default function Footer() {
             <div className="rounded-lg overflow-hidden shadow-lg border-2 border-blue-700">
               <iframe 
                 src={`https://maps.google.com/maps?q=${encodeURIComponent(direccionMapa)}&z=17&output=embed&iwloc=A`}
-                width="250" 
+                width="240" 
                 height="250" 
                 style={{border:0}} 
                 allowFullScreen={true}
