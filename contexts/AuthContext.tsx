@@ -21,9 +21,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, pass: string) => {
     setIsLoggingIn(true);
     try {
-      // AQUÍ OCURRE LA MAGIA: Llamamos a NextAuth
+
       const result = await signIn("credentials", {
-        redirect: false, // Importante: false para manejar nosotros la redirección y errores
+        redirect: false, 
         email,
         password: pass,
       });
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    await signOut({ callbackUrl: "/login" });
+    await signOut({ callbackUrl: "/" });
   };
 
   return (

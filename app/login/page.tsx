@@ -50,26 +50,40 @@ export default function LoginPage() {
     setError(null);
   };
 
-  // --- RENDERIZADO CONDICIONAL (Evita el parpadeo) ---
-  // Si está cargando la sesión o ya está autenticado, mostramos un Spinner
-  // en lugar del formulario. Así el usuario nunca ve el login si ya tiene permiso.
   if (status === "loading" || status === "authenticated") {
     return (
-      <div className="flex min-h-screen flex-col bg-gray-50">
-        <Header />
-        <main className="flex-1 flex items-center justify-center relative">
-          {/* Fondo decorativo igual que abajo */}
-          <div className="absolute top-0 left-0 z-0 h-full w-full bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50" />
+      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white">
+        {/* Fondo degradado suave (el mismo de tu login para consistencia) */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50" />
 
-          <div className="relative z-10 text-center p-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50">
-            <div className="h-14 w-14 animate-spin rounded-full border-4 border-blue-600 border-t-transparent mx-auto mb-4"></div>
-            <h2 className="text-xl font-semibold text-gray-800">
-              Verificando credenciales...
-            </h2>
-            <p className="text-gray-500 mt-2">Por favor espere un momento.</p>
+        <div className="relative z-10 flex flex-col items-center">
+          {/* Logo con efecto de brillo/resplandor */}
+          <div className="relative mb-6">
+            <div className="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-20 animate-pulse"></div>
+            <Image
+              src="/sis_oasis.png"
+              alt="Cargando SIO"
+              width={80} // Hacemos el logo un poco más grande
+              height={80}
+              className="rounded-full relative shadow-2xl"
+              priority
+            />
           </div>
-        </main>
-        <Footer />
+
+          {/* Spinner Personalizado */}
+          <div className="flex items-center gap-2 mb-4">
+            <div className="h-3 w-3 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+            <div className="h-3 w-3 bg-purple-600 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+            <div className="h-3 w-3 bg-pink-600 rounded-full animate-bounce"></div>
+          </div>
+
+          <h2 className="text-2xl font-bold text-gray-800 tracking-tight">
+            Bienvenido a Oasis
+          </h2>
+          <p className="text-gray-500 font-medium mt-1 animate-pulse">
+            Preparando tu entorno de trabajo...
+          </p>
+        </div>
       </div>
     );
   }
