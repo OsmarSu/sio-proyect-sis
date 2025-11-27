@@ -1,19 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react"; // Importación clave para manejar el estado
 import { useAuth } from "@/contexts/AuthContext";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 
 export default function LoginPage() {
   const { login } = useAuth();
+  // Usamos useSession directamente para verificar el estado real de la cookie
+  const { status } = useSession();
+  const router = useRouter();
+
   const [email, setEmail] = useState("admin@oasis.com");
   const [password, setPassword] = useState("password123");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  // --- LÓGICA DE PROTECCIÓN Y REDIRECCIÓN ---
+  useEffect(() => {
+    // Si NextAuth confirma que estamos autenticados, nos vamos al dashboard
+    if (status === "authenticated") {
+      router.replace("/dashboard");
+    }
+  }, [status, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,37 +36,60 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
+      // No necesitamos redirigir aquí manualmente,
+      // el cambio de estado de sesión disparará el useEffect de arriba.
     } catch (err: any) {
       setError(err.message || "Error al iniciar sesión. Inténtalo de nuevo.");
-    } finally {
       setIsLoading(false);
     }
   };
 
-  // Nueva función para limpiar los campos
   const handleClear = () => {
     setEmail("");
     setPassword("");
     setError(null);
   };
 
+  // --- RENDERIZADO CONDICIONAL (Evita el parpadeo) ---
+  // Si está cargando la sesión o ya está autenticado, mostramos un Spinner
+  // en lugar del formulario. Así el usuario nunca ve el login si ya tiene permiso.
+  if (status === "loading" || status === "authenticated") {
+    return (
+      <div className="flex min-h-screen flex-col bg-gray-50">
+        <Header />
+        <main className="flex-1 flex items-center justify-center relative">
+          {/* Fondo decorativo igual que abajo */}
+          <div className="absolute top-0 left-0 z-0 h-full w-full bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50" />
+
+          <div className="relative z-10 text-center p-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50">
+            <div className="h-14 w-14 animate-spin rounded-full border-4 border-blue-600 border-t-transparent mx-auto mb-4"></div>
+            <h2 className="text-xl font-semibold text-gray-800">
+              Verificando credenciales...
+            </h2>
+            <p className="text-gray-500 mt-2">Por favor espere un momento.</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // --- FORMULARIO DE LOGIN (Solo se ve si status === "unauthenticated") ---
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1 flex items-center justify-center bg-gray-50 relative overflow-hidden pt-16">
-
         <div className="absolute top-0 left-0 z-0 h-full w-full bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50" />
 
         <div className="w-full max-w-md relative z-10 px-8 py-12">
-          
           <div className="flex flex-col items-center mb-8">
             <div className="flex items-center gap-3 mb-4">
               <Image
-                src="/sis_oasis.png" 
+                src="/sis_oasis.png"
                 alt="SIO"
-                width={56} 
+                width={56}
                 height={56}
-                className="rounded-full object-cover" 
+                className="rounded-full object-cover"
                 priority
               />
               <span className="text-gray-900 font-bold text-2xl">SIO</span>
@@ -172,7 +209,7 @@ export default function LoginPage() {
               >
                 {isLoading ? "Iniciando..." : "Iniciar Sesión"}
               </button>
-              
+
               <button
                 type="button"
                 onClick={handleClear}

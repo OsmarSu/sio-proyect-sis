@@ -1,29 +1,23 @@
 // app/dashboard/productos/types.ts
 
+// Esta es la forma que espera tu UI (Tarjetas)
 export interface Product {
   id: string;
-  code: string;           
+  code: string;
   name: string;
-  description: string;    
-  category: string;       
-  supplier: string;       
-
+  description: string;
+  category: string;
+  supplier: string; // Lo usaremos para la MARCA
   currentStock: number;
-  minStock: number;       
-
-  majorPrice: number;     
-  minorPrice: number;     
-
-  ageRange: string;       
-  isNew: boolean;         
-  isOffer: boolean;       
-  
-  active: boolean;        
-
-  createdAt: Date | string;
-  updatedAt: Date | string;
+  minStock: number;
+  majorPrice: number; // Lo usaremos para el COSTO
+  minorPrice: number; // Lo usaremos para el PRECIO DE VENTA
+  ageRange: string;
+  isNew: boolean;
+  isOffer: boolean;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export type ProductFormData = Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'active'>;
-
-export type ProductCategory = 'Construcción' | 'Muñecas' | 'Juegos de Mesa' | 'Deportes' | 'Otros';
+export interface ProductFormData extends Omit<Product, "id" | "createdAt" | "updatedAt"> {}

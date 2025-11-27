@@ -1,105 +1,56 @@
-// middleware.ts
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { jwtVerify } from 'jose';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'tu-super-secreto-cambialo-en-produccion-12345'
-);
+export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
 
-// Rutas públicas (no requieren autenticación)
-const PUBLIC_PATHS = [
-  '/',
-  '/login',
-  '/register',
-  '/cliente/catalogo',
-  '/dashboard',
-];
-// si quiren entrar solo agregar '/dashboard', <----
-// Rutas de API públicas
-const PUBLIC_API_PATHS = [
-  '/api/auth/login',
-  '/api/auth/register',
-  '/api/auth/logout',
-];
-
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  // Verificar si es una ruta pública
-  const isPublicPath = PUBLIC_PATHS.some(path => pathname === path || pathname.startsWith(path + '/'));
-  const isPublicApiPath = PUBLIC_API_PATHS.some(path => pathname.startsWith(path));
-
-  if (isPublicPath || isPublicApiPath) {
+  // 1. ZONA DE SEGURIDAD:
+  // Permitimos pasar SIEMPRE a las rutas de autenticación y archivos estáticos.
+  // Si bloqueamos esto, rompemos el login (bucle infinito).
+  if (
+    pathname.startsWith("/api/auth") ||
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/favicon.ico") ||
+    pathname.startsWith("/public")
+  ) {
     return NextResponse.next();
   }
 
-  // Obtener token de las cookies
-  const token = request.cookies.get('auth-token')?.value;
+  // 2. Obtener el token
+  // IMPORTANTE: Asegúrate de que NEXTAUTH_SECRET en .env sea el mismo
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-  // Si no hay token, redirigir a login
-  if (!token) {
-    console.log(`[Middleware] No token found, redirecting from ${pathname} to /login`);
-    const url = request.nextUrl.clone();
-    url.pathname = '/login';
-    url.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(url);
+  // 3. PROTECCIÓN DEL DASHBOARD (El Muro)
+  // Si la ruta empieza con /dashboard y NO hay token -> Fuera.
+  if (pathname.startsWith("/dashboard")) {
+    if (!token) {
+      // Usuario no autorizado intentando entrar al panel
+      const url = req.nextUrl.clone();
+      url.pathname = "/login";
+      url.searchParams.set("callbackUrl", pathname); // Para regresar después de loguear
+      return NextResponse.redirect(url);
+    }
   }
 
-  try {
-    // Verificar token
-    const { payload } = await jwtVerify(token, JWT_SECRET);
-    const userRole = payload.role as string;
-    const userId = payload.id as string;
-
-    console.log(`[Middleware] User ${userId} (${userRole}) accessing ${pathname}`);
-
-    // Proteger rutas del dashboard (solo PERSONAL)
-    if (pathname.startsWith('/dashboard')) {
-      if (userRole !== 'PERSONAL') {
-        console.log(`[Middleware] User ${userId} denied access to dashboard (role: ${userRole})`);
-        const url = request.nextUrl.clone();
-        url.pathname = '/cliente/catalogo';
-        return NextResponse.redirect(url);
-      }
+  // 4. PROTECCIÓN DEL LOGIN (UX)
+  // Si el usuario YA tiene token y quiere ir al login -> Lo mandamos al dashboard.
+  if (pathname === "/login" || pathname === "/register") {
+    if (token) {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
     }
-
-    // Proteger rutas de cliente (solo CLIENTE y PERSONAL)
-    if (pathname.startsWith('/cliente') && !pathname.startsWith('/cliente/catalogo')) {
-      if (userRole !== 'CLIENTE' && userRole !== 'PERSONAL') {
-        console.log(`[Middleware] User ${userId} denied access to client area`);
-        const url = request.nextUrl.clone();
-        url.pathname = '/';
-        return NextResponse.redirect(url);
-      }
-    }
-
-    // Añadir headers con información del usuario
-    const response = NextResponse.next();
-    response.headers.set('x-user-id', userId);
-    response.headers.set('x-user-role', userRole);
-    return response;
-  } catch (error) {
-    // Token inválido, redirigir a login
-    console.error(`[Middleware] Invalid token for ${pathname}:`, error);
-    
-    // Eliminar cookie inválida
-    const response = NextResponse.redirect(new URL('/login', request.url));
-    response.cookies.delete('auth-token');
-    response.searchParams.set('redirect', pathname);
-    return response;
   }
+
+  // Si no cae en ningún caso anterior, dejamos pasar.
+  return NextResponse.next();
 }
 
 export const config = {
+  // El Matcher optimiza Next.js para que no ejecute el middleware en todo
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    "/dashboard/:path*", // Proteger todo lo que esté bajo dashboard
+    "/login",            // Interceptar login
+    "/register",         // Interceptar registro
+    "/cliente/:path*"    // Proteger área de clientes
   ],
 };
