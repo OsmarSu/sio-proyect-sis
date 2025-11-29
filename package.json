@@ -16,6 +16,7 @@
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.8.0",
     "cookie": "^1.0.2",
+    "crc32-stream": "^7.0.1",
     "date-fns": "^4.1.0",
     "exceljs": "^4.4.0",
     "firebase": "^12.5.0",
@@ -46,6 +47,10 @@
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   }
 }

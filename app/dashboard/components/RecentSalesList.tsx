@@ -1,11 +1,17 @@
 import Badge from "@/components/ui/Badge";
 
-const recentSales = [
-  { id: "V001", customer: "Juan Pérez", date: "2024-01-15", total: 250 },
-  { id: "V002", customer: "María García", date: "2024-01-15", total: 180 },
-];
+type RecentSale = {
+  id: number;
+  customer: string;
+  date: string;
+  total: number;
+};
 
-const RecentSalesList = () => {
+interface RecentSalesListProps {
+  sales: RecentSale[];
+}
+
+const RecentSalesList = ({ sales }: RecentSalesListProps) => {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <div className="flex items-center gap-3 mb-2">
@@ -18,23 +24,27 @@ const RecentSalesList = () => {
       </div>
       <p className="text-sm text-gray-600 mb-6">Últimas ventas realizadas</p>
       <div className="space-y-3">
-        {recentSales.map((sale) => (
-          <div
-            key={sale.id}
-            className="flex justify-between items-center border border-gray-200 p-4 rounded-lg hover:shadow-md transition-shadow"
-          >
-            <div>
-              <p className="font-semibold text-gray-900">{sale.id}</p>
-              <p className="text-sm text-gray-600 mt-1">
-                {sale.customer} • {sale.date}
-              </p>
+        {sales.length > 0 ? (
+          sales.map((sale) => (
+            <div
+              key={sale.id}
+              className="flex justify-between items-center border border-gray-200 p-4 rounded-lg hover:shadow-md transition-shadow"
+            >
+              <div>
+                <p className="font-semibold text-gray-900">Venta #{sale.id}</p>
+                <p className="text-sm text-gray-600 mt-1">
+                  {sale.customer} • {new Date(sale.date).toLocaleDateString()}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="font-semibold text-gray-900 mb-1">Bs. {sale.total.toFixed(2)}</p>
+                <Badge variant="success">Completada</Badge>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="font-semibold text-gray-900 mb-1">Bs. {sale.total}</p>
-              <Badge variant="success">Completada</Badge>
-            </div>
-          </div>
-        ))}
+          ))
+        ) : (
+          <p className="text-sm text-gray-500 text-center py-4">No hay ventas recientes.</p>
+        )}
       </div>
     </div>
   );

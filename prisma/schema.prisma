@@ -1,132 +1,703 @@
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlserver"
   url      = env("DATABASE_URL")
-  directUrl= env("DIRECT_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  password  String?  // Hasheado con bcrypt
-  role      Role     @default(CLIENTE)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// ==============================================
+// 1. MÓDULO PERSONA (Núcleo)
+// ==============================================
+
+model Persona {
+  id          Int     @id @default(autoincrement()) @map("persona_id")
+  nombre      String  @db.VarChar(100)
+  apellido    String  @db.VarChar(100)
+  documento   String? @db.VarChar(50)
+  telefono    String? @db.VarChar(20)
+  email       String? @db.VarChar(100)
+  direccion   String? @db.VarChar(200)
+  tipoPersona String? @map("tipo_persona") @db.VarChar(50)
+
+  // Relaciones Inversas
+  clientes    Cliente[]
+  proveedores Proveedor[]
+  personal    Personal[]
+
+  @@map("personas")
+}
+
+// ==============================================
+// 2. MÓDULO CLIENTES
+// ==============================================
+
+model TipoCliente {
+  id              Int               @id @default(autoincrement()) @map("tipo_cliente_id")
+  nombre          String            @db.VarChar(100)
+  clientes        Cliente[]
+  preciosEspecial PrecioTipoCliente[]
+
+  @@map("tipos_cliente")
+}
+
+model Cliente {
+  id            Int       @id @default(autoincrement()) @map("cliente_id")
+  fechaRegistro DateTime? @map("fecha_registro") @db.DateTime2
+  estado        Boolean?  @default(true) // BIT -> Boolean
 
   // Relaciones
-  purchases Purchase[]
-  sales     Sale[]
+  personaId     Int       @map("persona_id")
+  persona       Persona   @relation(fields: [personaId], references: [id])
+  
+  tipoClienteId Int?      @map("tipo_cliente_id")
+  tipoCliente   TipoCliente? @relation(fields: [tipoClienteId], references: [id])
 
-  @@map("users")
+  // Detalle extendido
+  datosCliente    DatosCliente[]
+  direcciones     DireccionCliente[]
+  contactos       ContactoCliente[]
+  pedidos         Pedido[]
+
+  @@map("clientes")
 }
 
-model Product {
-  id          String   @id @default(cuid())
-  name        String
-  description String?  @db.Text
-  price       Float
-  stock       Int      @default(0)
-  sku         String?  @unique
-  imageUrl    String?  @db.Text
-  category    String?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model DatosCliente {
+  id           Int     @id @default(autoincrement()) @map("datos_cliente_id")
+  clienteId    Int     @map("cliente_id")
+  cliente      Cliente @relation(fields: [clienteId], references: [id])
+  preferencias String? @db.Text
+  notas        String? @db.Text
+
+  @@map("datos_cliente")
+}
+
+model DireccionCliente {
+  id        Int     @id @default(autoincrement()) @map("direccion_id")
+  clienteId Int     @map("cliente_id")
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
+  direccion String? @db.VarChar(200)
+  ciudad    String? @db.VarChar(100)
+  pais      String? @db.VarChar(100)
+
+  @@map("direcciones_cliente")
+}
+
+model ContactoCliente {
+  id             Int     @id @default(autoincrement()) @map("contacto_cliente_id")
+  clienteId      Int     @map("cliente_id")
+  cliente        Cliente @relation(fields: [clienteId], references: [id])
+  nombreContacto String? @map("nombre_contacto") @db.VarChar(100)
+  telefono       String? @db.VarChar(20)
+  email          String? @db.VarChar(100)
+
+  @@map("contactos_cliente")
+}
+
+// ==============================================
+// 3. MÓDULO PROVEEDORES
+// ==============================================
+
+model Proveedor {
+  id        Int     @id @default(autoincrement()) @map("proveedor_id")
+  personaId Int     @map("persona_id")
+  persona   Persona @relation(fields: [personaId], references: [id])
+
+  categorias ProveedorCategoria[]
+  contactos  ContactoProveedor[]
+  suministros Suministro[]
+
+  @@map("proveedores")
+}
+
+model ProveedorCategoria {
+  id          Int       @id @default(autoincrement()) @map("proveedor_categoria_id")
+  proveedorId Int       @map("proveedor_id")
+  proveedor   Proveedor @relation(fields: [proveedorId], references: [id])
+  categoriaId Int?      @map("categoria_id")
+  // Nota: Podrías relacionarlo con Categoria de productos si aplica
+
+  @@map("proveedor_categorias")
+}
+
+model ContactoProveedor {
+  id             Int       @id @default(autoincrement()) @map("contacto_proveedor_id")
+  proveedorId    Int       @map("proveedor_id")
+  proveedor      Proveedor @relation(fields: [proveedorId], references: [id])
+  nombreContacto String?   @map("nombre_contacto") @db.VarChar(100)
+  telefono       String?   @db.VarChar(20)
+  email          String?   @db.VarChar(100)
+
+  @@map("contactos_proveedor")
+}
+
+model Suministro {
+  id          Int      @id @default(autoincrement()) @map("suministro_id")
+  proveedorId Int      @map("proveedor_id")
+  proveedor   Proveedor @relation(fields: [proveedorId], references: [id])
+  fecha       DateTime? @db.DateTime2
+
+  detalles    DetalleSuministro[]
+
+  @@map("suministros")
+}
+
+model DetalleSuministro {
+  id             Int        @id @default(autoincrement()) @map("detalle_suministro_id")
+  suministroId   Int        @map("suministro_id")
+  suministro     Suministro @relation(fields: [suministroId], references: [id])
+  productoId     Int?       @map("producto_id")
+  producto       Producto?  @relation(fields: [productoId], references: [id])
+  cantidad       Int?
+  precioUnitario Decimal?   @map("precio_unitario") @db.Decimal(18, 2)
+
+  @@map("detalle_suministros")
+}
+
+// ==============================================
+// 4. MÓDULO PERSONAL & SEGURIDAD (Usuarios)
+// ==============================================
+
+model Cargo {
+  id       Int        @id @default(autoincrement()) @map("cargo_id")
+  nombre   String?    @db.VarChar(100)
+  personal Personal[]
+
+  @@map("cargos")
+}
+
+model Personal {
+  id        Int     @id @default(autoincrement()) @map("personal_id")
+  personaId Int     @map("persona_id")
+  persona   Persona @relation(fields: [personaId], references: [id])
+  cargoId   Int?    @map("cargo_id")
+  cargo     Cargo?  @relation(fields: [cargoId], references: [id])
+  sexo      String? @db.VarChar(10)
+
+  usuario   Usuario? // Relación 1:1 con Usuario
+
+  @@map("personal")
+}
+
+model Usuario {
+  id           Int      @id @default(autoincrement()) @map("usuario_id")
+  personalId   Int      @unique @map("personal_id")
+  personal     Personal @relation(fields: [personalId], references: [id])
+  username     String?  @db.VarChar(50)
+  passwordHash String?  @map("password_hash") @db.VarChar(200)
+  estado       Boolean? @default(true)
+
+  // Relaciones de Seguridad
+  roles               UsuarioRol[]
+  sesiones            SesionUsuario[]
+  intentosFallidos    IntentoAccesoFallido[]
+  politicasCreadas    PoliticaBloqueoCuenta[] @relation("UsuarioCreador")
+  configModificadas   ConfiguracionSeguridad[]
+  eventosAfectados    EventosBloqueoUsuario[] @relation("UsuarioAfectado")
+  eventosDesbloqueos  EventosBloqueoUsuario[] @relation("UsuarioDesbloquea")
+  alertasInvolucrado  AlertaSeguridad[]       @relation("UsuarioInvolucrado")
+  alertasRevisor      AlertaSeguridad[]       @relation("UsuarioRevisor")
+  
+  // Auditoria
+  ajustesInventario   AjusteInventario[]
+  historialReportes   HistorialGeneracionReporte[]
+  historialAlertas    HistorialAlerta[]
+  cambiosPrecio       HistorialCambioPrecio[]
+  bitacora            BitacoraActividadGeneral[]
+
+  @@map("usuarios")
+}
+
+model Rol {
+  id       Int           @id @default(autoincrement()) @map("rol_id")
+  nombre   String?       @db.VarChar(100)
+  permisos RolPermiso[]
+
+  @@map("roles")
+}
+
+model UsuarioRol {
+  id        Int @id @default(autoincrement()) @map("usuario_rol_id")
+  usuarioId Int @map("usuario_id")
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+  rolId     Int @map("rol_id")
+  // Falta relacion directa con Rol en tu SQL, asumo que existe
+  
+  @@map("usuario_roles")
+}
+
+model Permiso {
+  id     Int          @id @default(autoincrement()) @map("permiso_id")
+  nombre String?      @db.VarChar(100)
+  roles  RolPermiso[]
+
+  @@map("permisos")
+}
+
+model RolPermiso {
+  id        Int     @id @default(autoincrement()) @map("rol_permiso_id")
+  rolId     Int     @map("rol_id")
+  rol       Rol     @relation(fields: [rolId], references: [id])
+  permisoId Int     @map("permiso_id")
+  permiso   Permiso @relation(fields: [permisoId], references: [id])
+
+  @@map("rol_permisos")
+}
+
+// ==============================================
+// 5. MÓDULO PRODUCTOS
+// ==============================================
+
+model Categoria {
+  id        Int        @id @default(autoincrement()) @map("categoria_id")
+  nombre    String?    @db.VarChar(100)
+  productos Producto[]
+
+  @@map("categorias")
+}
+
+model LineaProducto {
+  id        Int        @id @default(autoincrement()) @map("linea_producto_id")
+  nombre    String?    @db.VarChar(100)
+  productos Producto[]
+
+  @@map("lineas_producto")
+}
+
+model Marca {
+  id        Int        @id @default(autoincrement()) @map("marca_id")
+  nombre    String?    @db.VarChar(100)
+  productos Producto[]
+
+  @@map("marcas")
+}
+
+model UnidadMedida {
+  id        Int        @id @default(autoincrement()) @map("unidad_medida_id")
+  nombre    String?    @db.VarChar(50)
+  productos Producto[]
+
+  @@map("unidades_medida")
+}
+
+model Producto {
+  id              Int     @id @default(autoincrement()) @map("producto_id")
+  nombre          String? @db.VarChar(100)
+  descripcion     String? @db.Text
+  stockActual     Int?    @map("stock_actual")
+
+  // Foreign Keys
+  categoriaId     Int?    @map("categoria_id")
+  categoria       Categoria? @relation(fields: [categoriaId], references: [id])
+  
+  lineaProductoId Int?    @map("linea_producto_id")
+  lineaProducto   LineaProducto? @relation(fields: [lineaProductoId], references: [id])
+  
+  marcaId         Int?    @map("marca_id")
+  marca           Marca?  @relation(fields: [marcaId], references: [id])
+  
+  unidadMedidaId  Int?    @map("unidad_medida_id")
+  unidadMedida    UnidadMedida? @relation(fields: [unidadMedidaId], references: [id])
 
   // Relaciones
-  purchaseItems PurchaseItem[]
-  saleItems     SaleItem[]
+  precios             Precio[]
+  detallePedidos      DetallePedido[]
+  detalleFacturas     DetalleFactura[]
+  detalleSuministros  DetalleSuministro[]
+  inventarios         Inventario[]
+  transferencias      TransferenciaStock[]
+  historialAlertas    HistorialAlerta[]
+  historialCambios    HistorialCambioPrecio[]
 
-  @@map("products")
+  @@map("productos")
 }
 
-model Supplier {
-  id        String   @id @default(cuid())
-  name      String
-  email     String?  @unique
-  phone     String?
-  address   String?  @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model TipoPrecio {
+  id      Int      @id @default(autoincrement()) @map("tipo_precio_id")
+  nombre  String?  @db.VarChar(50)
+  precios Precio[]
 
-  // Relaciones
-  purchases Purchase[]
-
-  @@map("suppliers")
+  @@map("tipos_precio")
 }
 
-model Purchase {
-  id         String   @id @default(cuid())
-  supplierId String
-  userId     String
-  total      Float
-  notes      String?  @db.Text
-  status     String   @default("pending") // pending, completed, cancelled
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+model Precio {
+  id           Int     @id @default(autoincrement()) @map("precio_id")
+  monto        Decimal? @db.Decimal(18, 2)
+  
+  productoId   Int?    @map("producto_id")
+  producto     Producto? @relation(fields: [productoId], references: [id])
+  
+  tipoPrecioId Int?    @map("tipo_precio_id")
+  tipoPrecio   TipoPrecio? @relation(fields: [tipoPrecioId], references: [id])
 
-  // Relaciones
-  supplier Supplier       @relation(fields: [supplierId], references: [id], onDelete: Cascade)
-  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items    PurchaseItem[]
+  preciosCliente PrecioTipoCliente[]
 
-  @@map("purchases")
+  @@map("precios")
 }
 
-model PurchaseItem {
-  id         String  @id @default(cuid())
-  purchaseId String
-  productId  String
-  quantity   Int
-  price      Float
+model PrecioTipoCliente {
+  id            Int @id @default(autoincrement()) @map("precio_tipo_cliente_id")
+  
+  tipoClienteId Int? @map("tipo_cliente_id")
+  tipoCliente   TipoCliente? @relation(fields: [tipoClienteId], references: [id])
+  
+  precioId      Int? @map("precio_id")
+  precio        Precio? @relation(fields: [precioId], references: [id])
 
-  // Relaciones
-  purchase Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
-  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  @@map("purchase_items")
+  @@map("precios_tipo_cliente")
 }
 
-model Sale {
-  id         String   @id @default(cuid())
-  userId     String
-  customerId String?
-  total      Float
-  notes      String?  @db.Text
-  status     String   @default("completed") // completed, cancelled, refunded
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+// ==============================================
+// 6. MÓDULO VENTAS
+// ==============================================
 
-  // Relaciones
-  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  customer Customer?  @relation(fields: [customerId], references: [id], onDelete: SetNull)
-  items    SaleItem[]
+model Pedido {
+  id        Int       @id @default(autoincrement()) @map("pedido_id")
+  fecha     DateTime? @db.DateTime2
+  estado    String?   @db.VarChar(50)
+  
+  clienteId Int?      @map("cliente_id")
+  cliente   Cliente?  @relation(fields: [clienteId], references: [id])
 
-  @@map("sales")
+  detalles  DetallePedido[]
+  facturas  Factura[]
+
+  @@map("pedidos")
 }
 
-model SaleItem {
-  id        String @id @default(cuid())
-  saleId    String
-  productId String
-  quantity  Int
-  price     Float
+model DetallePedido {
+  id             Int      @id @default(autoincrement()) @map("detalle_pedido_id")
+  cantidad       Int?
+  precioUnitario Decimal? @map("precio_unitario") @db.Decimal(18, 2)
+  
+  pedidoId       Int?     @map("pedido_id")
+  pedido         Pedido?  @relation(fields: [pedidoId], references: [id])
+  
+  productoId     Int?     @map("producto_id")
+  producto       Producto? @relation(fields: [productoId], references: [id])
 
-  // Relaciones
-  sale    Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  @@map("sale_items")
+  @@map("detalles_pedido")
 }
 
-enum Role {
-  CLIENTE
-  EMPLEADO
-  ADMIN
+model Factura {
+  id       Int       @id @default(autoincrement()) @map("factura_id")
+  fecha    DateTime? @db.DateTime2
+  total    Decimal?  @db.Decimal(18, 2)
+  
+  pedidoId Int?      @map("pedido_id")
+  pedido   Pedido?   @relation(fields: [pedidoId], references: [id])
+
+  detalles DetalleFactura[]
+  ventas   Venta[]
+
+  @@map("facturas")
+}
+
+model DetalleFactura {
+  id             Int      @id @default(autoincrement()) @map("detalle_factura_id")
+  cantidad       Int?
+  precioUnitario Decimal? @map("precio_unitario") @db.Decimal(18, 2)
+  
+  facturaId      Int?     @map("factura_id")
+  factura        Factura? @relation(fields: [facturaId], references: [id])
+  
+  productoId     Int?     @map("producto_id")
+  producto       Producto? @relation(fields: [productoId], references: [id])
+
+  @@map("detalles_factura")
+}
+
+model Venta {
+  id        Int      @id @default(autoincrement()) @map("venta_id")
+  fecha     DateTime? @db.DateTime2
+  
+  facturaId Int?     @map("factura_id")
+  factura   Factura? @relation(fields: [facturaId], references: [id])
+
+  @@map("ventas")
+}
+
+// ==============================================
+// 7. MÓDULO INVENTARIOS
+// ==============================================
+
+model TipoAlmacen {
+  id       Int       @id @default(autoincrement()) @map("tipo_almacen_id")
+  nombre   String?   @db.VarChar(100)
+  almacenes Almacen[]
+
+  @@map("tipos_almacen")
+}
+
+model Almacen {
+  id              Int     @id @default(autoincrement()) @map("almacen_id")
+  nombre          String? @db.VarChar(100)
+  ubicacion       String? @db.VarChar(200)
+  capacidadMaxima Int?    @map("capacidad_maxima")
+  
+  tipoAlmacenId   Int?    @map("tipo_almacen_id")
+  tipoAlmacen     TipoAlmacen? @relation(fields: [tipoAlmacenId], references: [id])
+
+  inventarios     Inventario[]
+  transferenciasOrigen TransferenciaStock[] @relation("AlmacenOrigen")
+  transferenciasDestino TransferenciaStock[] @relation("AlmacenDestino")
+
+  @@map("almacenes")
+}
+
+model Inventario {
+  id         Int @id @default(autoincrement()) @map("inventario_id")
+  stock      Int?
+  
+  productoId Int? @map("producto_id")
+  producto   Producto? @relation(fields: [productoId], references: [id])
+  
+  almacenId  Int? @map("almacen_id")
+  almacen    Almacen? @relation(fields: [almacenId], references: [id])
+
+  ajustes    AjusteInventario[]
+
+  @@map("inventarios")
+}
+
+model AjusteInventario {
+  id           Int       @id @default(autoincrement()) @map("ajuste_inventario_id")
+  tipoAjuste   String?   @map("tipo_ajuste") @db.VarChar(50)
+  cantidad     Int?
+  fecha        DateTime? @db.DateTime2
+  
+  inventarioId Int?      @map("inventario_id")
+  inventario   Inventario? @relation(fields: [inventarioId], references: [id])
+  
+  usuarioId    Int?      @map("usuario_id")
+  usuario      Usuario?  @relation(fields: [usuarioId], references: [id])
+
+  @@map("ajustes_inventario")
+}
+
+model TransferenciaStock {
+  id               Int       @id @default(autoincrement()) @map("transferencia_stock_id")
+  cantidad         Int?
+  fecha            DateTime? @db.DateTime2
+  
+  productoId       Int?      @map("producto_id")
+  producto         Producto? @relation(fields: [productoId], references: [id])
+  
+  almacenOrigenId  Int?      @map("almacen_origen_id")
+  almacenOrigen    Almacen?  @relation("AlmacenOrigen", fields: [almacenOrigenId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  
+  almacenDestinoId Int?      @map("almacen_destino_id")
+  almacenDestino   Almacen?  @relation("AlmacenDestino", fields: [almacenDestinoId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("transferencias_stock")
+}
+
+// ==============================================
+// 8. MÓDULO AUDITORÍA & BI
+// ==============================================
+
+model Reporte {
+  id                Int       @id @default(autoincrement()) @map("reporte_id")
+  nombre            String?   @db.VarChar(100)
+  descripcion       String?   @db.Text
+  camposConfig      ReporteCampoConfig[]
+  filtrosConfig     ReporteFiltroConfig[]
+  historialGeneracion HistorialGeneracionReporte[]
+
+  @@map("reportes")
+}
+
+model ReporteCampoConfig {
+  id        Int      @id @default(autoincrement()) @map("campo_config_id")
+  campo     String?  @db.VarChar(100)
+  reporteId Int?     @map("reporte_id")
+  reporte   Reporte? @relation(fields: [reporteId], references: [id])
+
+  @@map("reporte_campos_config")
+}
+
+model ReporteFiltroConfig {
+  id        Int      @id @default(autoincrement()) @map("filtro_config_id")
+  filtro    String?  @db.VarChar(100)
+  reporteId Int?     @map("reporte_id")
+  reporte   Reporte? @relation(fields: [reporteId], references: [id])
+
+  @@map("reporte_filtros_config")
+}
+
+model HistorialGeneracionReporte {
+  id        Int      @id @default(autoincrement()) @map("historial_reporte_id")
+  fecha     DateTime? @db.DateTime2
+  
+  reporteId Int?     @map("reporte_id")
+  reporte   Reporte? @relation(fields: [reporteId], references: [id])
+  
+  usuarioId Int?     @map("usuario_id")
+  usuario   Usuario? @relation(fields: [usuarioId], references: [id])
+
+  @@map("historial_reportes")
+}
+
+model AlertaConfiguracion {
+  id         Int       @id @default(autoincrement()) @map("alerta_config_id")
+  tipoAlerta String?   @map("tipo_alerta") @db.VarChar(100)
+  umbral     Int?
+  prioridad  String?   @db.VarChar(50)
+  activa     Boolean?  @default(true) // BIT -> Boolean
+
+  historial  HistorialAlerta[]
+
+  @@map("alertas_configuracion")
+}
+
+model HistorialAlerta {
+  id                Int       @id @default(autoincrement()) @map("historial_alerta_id")
+  mensaje           String?   @db.Text
+  fechaGeneracion   DateTime? @map("fecha_generacion") @db.DateTime2
+  estado            String?   @db.VarChar(50)
+  fechaResolucion   DateTime? @map("fecha_resolucion") @db.DateTime2
+  
+  alertaConfigId    Int?      @map("alerta_config_id")
+  alertaConfig      AlertaConfiguracion? @relation(fields: [alertaConfigId], references: [id])
+  
+  productoId        Int?      @map("producto_id")
+  producto          Producto? @relation(fields: [productoId], references: [id])
+  
+  usuarioResolutorId Int?     @map("usuario_resolutor_id")
+  usuarioResolutor   Usuario? @relation(fields: [usuarioResolutorId], references: [id])
+
+  @@map("historial_alertas")
+}
+
+model HistorialCambioPrecio {
+  id           Int       @id @default(autoincrement()) @map("historial_precio_id")
+  precioAntiguo Decimal? @map("precio_antiguo") @db.Decimal(18, 2)
+  precioNuevo   Decimal? @map("precio_nuevo") @db.Decimal(18, 2)
+  fecha         DateTime? @db.DateTime2
+  
+  productoId    Int?     @map("producto_id")
+  producto      Producto? @relation(fields: [productoId], references: [id])
+  
+  usuarioId     Int?     @map("usuario_id")
+  usuario       Usuario? @relation(fields: [usuarioId], references: [id])
+
+  @@map("historial_cambios_precio")
+}
+
+model BitacoraActividadGeneral {
+  id              Int       @id @default(autoincrement()) @map("bitacora_id")
+  accion          String?   @db.VarChar(200)
+  tablaAfectada   String?   @map("tabla_afectada") @db.VarChar(100)
+  registroAfectadoId Int?   @map("registro_afectado_id")
+  fecha           DateTime? @db.DateTime2
+  ipAddress       String?   @map("ip_address") @db.VarChar(50)
+  
+  usuarioId       Int?      @map("usuario_id")
+  usuario         Usuario?  @relation(fields: [usuarioId], references: [id])
+
+  @@map("bitacora_general")
+}
+
+// Modelos extra de seguridad (Simplificados para mapeo)
+model SesionUsuario {
+  id          Int      @id @default(autoincrement()) @map("sesion_id")
+  usuarioId   Int      @map("usuario_id")
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id])
+  fechaInicio DateTime? @map("fecha_inicio")
+  fechaFin    DateTime? @map("fecha_fin")
+
+  @@map("sesiones_usuario")
+}
+
+model IntentoAccesoFallido {
+  id        Int      @id @default(autoincrement()) @map("intento_id")
+  usuarioId Int      @map("usuario_id")
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+  fecha     DateTime?
+  ipAddress String?  @map("ip_address") @db.VarChar(50)
+
+  @@map("intentos_fallidos")
+}
+
+model PoliticaBloqueoCuenta {
+  id                    Int      @id @default(autoincrement()) @map("politica_id")
+  nombrePolitica        String?  @map("nombre_politica") @db.VarChar(100)
+  intentosMaximos       Int?     @default(3) @map("intentos_maximos")
+  tiempoBloqueoMinutos  Int?     @default(30) @map("tiempo_bloqueo_minutos")
+  bloqueoDefinitivo     Boolean? @default(false) @map("bloqueo_definitivo")
+  tipoBloqueo           String?  @default("TEMPORAL") @map("tipo_bloqueo") @db.VarChar(50)
+  requiereDesbloqueoAdmin Boolean? @default(false) @map("requiere_desbloqueo_admin")
+  estado                Boolean? @default(true)
+  fechaCreacion         DateTime? @default(now()) @map("fecha_creacion")
+  
+  usuarioCreadorId      Int?     @map("usuario_creador")
+  usuarioCreador        Usuario? @relation("UsuarioCreador", fields: [usuarioCreadorId], references: [id])
+
+  eventos               EventosBloqueoUsuario[]
+
+  @@map("politicas_bloqueo")
+}
+
+model ConfiguracionSeguridad {
+  id                 Int      @id @default(autoincrement()) @map("config_id")
+  nombreParametro    String?  @unique @map("nombre_parametro") @db.VarChar(100)
+  valorParametro     String?  @map("valor_parametro") @db.VarChar(500)
+  descripcion        String?  @db.Text
+  tipoParametro      String?  @map("tipo_parametro") @db.VarChar(50)
+  categoria          String?  @db.VarChar(100)
+  requiereReinicio   Boolean? @default(false) @map("requiere_reinicio")
+  fechaModificacion  DateTime? @default(now()) @map("fecha_modificacion")
+  
+  usuarioModificadorId Int?    @map("usuario_modificador")
+  usuarioModificador   Usuario? @relation(fields: [usuarioModificadorId], references: [id])
+
+  @@map("configuracion_seguridad")
+}
+
+model EventosBloqueoUsuario {
+  id                 Int      @id @default(autoincrement()) @map("evento_bloqueo_id")
+  tipoEvento         String?  @map("tipo_evento") @db.VarChar(50)
+  motivo             String?  @db.VarChar(200)
+  fechaEvento        DateTime? @default(now()) @map("fecha_evento")
+  fechaDesbloqueo    DateTime? @map("fecha_desbloqueo")
+  intentosAcumulados Int?     @default(0) @map("intentos_acumulados")
+  estado             String?  @default("ACTIVO") @db.VarChar(50)
+  ipOrigen           String?  @map("ip_origen") @db.VarChar(50)
+  observaciones      String?  @db.Text
+
+  usuarioAfectadoId  Int?     @map("usuario_afectado_id")
+  usuarioAfectado    Usuario? @relation("UsuarioAfectado", fields: [usuarioAfectadoId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  
+  politicaAplicadaId Int?     @map("politica_aplicada_id")
+  politicaAplicada   PoliticaBloqueoCuenta? @relation(fields: [politicaAplicadaId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  
+  usuarioDesbloqueaId Int?    @map("usuario_desbloquea")
+  usuarioDesbloquea   Usuario? @relation("UsuarioDesbloquea", fields: [usuarioDesbloqueaId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("eventos_bloqueo")
+}
+
+model AlertaSeguridad {
+  id                  Int      @id @default(autoincrement()) @map("alerta_seguridad_id")
+  tipoAlerta          String?  @map("tipo_alerta") @db.VarChar(100)
+  severidad           String?  @default("MEDIA") @db.VarChar(50)
+  titulo              String?  @db.VarChar(200)
+  descripcion         String?  @db.Text
+  tablaAfectada       String?  @map("tabla_afectada") @db.VarChar(100)
+  registroAfectadoId  Int?     @map("registro_afectado_id")
+  fechaDeteccion      DateTime? @default(now()) @map("fecha_deteccion")
+  estado              String?  @default("PENDIENTE") @db.VarChar(50)
+  fechaRevision       DateTime? @map("fecha_revision")
+  accionTomada        String?  @map("accion_tomada") @db.Text
+  riesgoEstimado      String?  @map("riesgo_estimado") @db.VarChar(50)
+  requiereAccionInmediata Boolean? @default(false) @map("requiere_accion_inmediata")
+
+  usuarioInvolucradoId Int?    @map("usuario_involucrado")
+  usuarioInvolucrado   Usuario? @relation("UsuarioInvolucrado", fields: [usuarioInvolucradoId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  
+  usuarioRevisorId     Int?    @map("usuario_revisor")
+  usuarioRevisor       Usuario? @relation("UsuarioRevisor", fields: [usuarioRevisorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("alertas_seguridad")
 }

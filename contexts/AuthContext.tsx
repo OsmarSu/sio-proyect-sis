@@ -1,139 +1,118 @@
-// contexts/AuthContext.tsx
-'use client';
+"use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'PERSONAL' | 'CLIENTE';
-}
+import { createContext, useContext, ReactNode, useState } from "react";
+import { signIn, signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface AuthContextType {
-  user: User | null;
-  loading: boolean;
+  user: any;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
-  isPersonal: boolean;
-  isCliente: boolean;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session, status } = useSession();
   const router = useRouter();
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  // Verificar sesión al cargar
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
+  const login = async (email: string, pass: string) => {
+    setIsLoggingIn(true);
     try {
-      const res = await fetch('/api/auth/me');
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
-      } else {
-        setUser(null);
-      }
-    } catch (error) {
-      console.error('Error verificando autenticación:', error);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const login = async (email: string, password: string) => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+      const result = await signIn("credentials", {
+        redirect: false,
+        email,
+        password: pass,
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Error al iniciar sesión');
+      if (result?.error) {
+        throw new Error("Credenciales inválidas. Verifica tu correo y contraseña.");
       }
 
-      setUser(data.user);
-      
-      // Redirigir según el rol
-      if (data.user.role === 'PERSONAL') {
-        router.push('/dashboard');
-      } else {
-        router.push('/cliente/catalogo');
-      }
+      // Si todo sale bien, vamos al dashboard
+      router.push("/dashboard");
+      router.refresh(); // Actualiza los componentes del servidor
     } catch (error: any) {
-      throw new Error(error.message || 'Error al iniciar sesión');
+      throw error; // Re-lanzamos el error para que tu LoginPage lo muestre en rojo
     } finally {
-      setLoading(false);
-    }
-  };
-
-  const register = async (email: string, password: string, name: string) => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Error al registrarse');
-      }
-
-      // Después de registrarse, hacer login automático
-      await login(email, password);
-    } catch (error: any) {
-      throw new Error(error.message || 'Error al registrarse');
-    } finally {
-      setLoading(false);
+      setIsLoggingIn(false);
     }
   };
 
   const logout = async () => {
-    setLoading(true);
+    await signOut({ callbackUrl: "/" });
+  };
+
+  const register = async (email: string, pass: string, name: string) => {
+    setIsLoggingIn(true);
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      setUser(null);
-      router.push('/');
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error);
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password: pass, name }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Error al registrarse");
+      }
+
+      // Si el registro es exitoso y el endpoint ya setea la cookie,
+      // podemos intentar hacer login automático o simplemente redirigir.
+      // Dado que el endpoint /api/auth/register ya hace setAuthCookie,
+      // el usuario debería estar logueado.
+
+      // Forzamos una actualización de la sesión si es necesario, 
+      // pero con next-auth a veces se requiere un signIn explícito para actualizar el cliente.
+      // Sin embargo, si usamos JWT custom como parece en el endpoint, 
+      // la cookie ya está puesta.
+
+      // Para asegurar compatibilidad con useSession de next-auth, 
+      // a veces es mejor hacer un signIn automático.
+
+      const result = await signIn("credentials", {
+        redirect: false,
+        email,
+        password: pass,
+      });
+
+      if (result?.error) {
+        // Si falla el login automático, redirigimos a login
+        router.push("/login");
+      } else {
+        router.push("/dashboard");
+        router.refresh();
+      }
+
+    } catch (error: any) {
+      throw error;
     } finally {
-      setLoading(false);
+      setIsLoggingIn(false);
     }
   };
 
-  const value = {
-    user,
-    loading,
-    login,
-    register,
-    logout,
-    isPersonal: user?.role === 'PERSONAL',
-    isCliente: user?.role === 'CLIENTE',
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{
+        user: session?.user,
+        login,
+        logout,
+        register,
+        isLoading: status === "loading" || isLoggingIn
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
-export function useAuth() {
+export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth debe usarse dentro de un AuthProvider');
-  }
+  if (!context) throw new Error("useAuth debe usarse dentro de AuthProvider");
   return context;
-}
+};

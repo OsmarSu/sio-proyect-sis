@@ -11,7 +11,7 @@ export default function LandingPage() {
       id: 1,
       name: 'Lego Classic',
       price: 229.99,
-      image: 'https://www.lego.com/cdn/cs/set/assets/blt10888b5e58f4fa76/3_11029_Classic_Sidekick_tall.jpg?fit=crop&format=jpg&quality=80&width=800&height=600&dpr=1',
+      image: 'https://placehold.co/600x400?text=Lego+Classic',
       category: 'Construcción',
       isNew: true
     },
@@ -19,21 +19,21 @@ export default function LandingPage() {
       id: 2,
       name: 'Muñeca Barbie Dreamhouse',
       price: 689.99,
-      image: 'https://toysmart.co/cdn/shop/products/01605-1_720x.jpg?v=1707227997',
+      image: 'https://placehold.co/600x400?text=Barbie+Dreamhouse',
       category: 'Muñecas'
     },
     {
       id: 3,
       name: 'Hot Wheels Pista Extrema',
       price: 345.99,
-      image: 'https://http2.mlstatic.com/D_NQ_NP_670063-MLA89683253713_082025-O.webp',
+      image: 'https://placehold.co/600x400?text=Hot+Wheels',
       category: 'Vehículos'
     },
     {
       id: 4,
       name: 'Kit de juguetes de Doctor',
       price: 419.99,
-      image: 'https://m.media-amazon.com/images/I/71XswLSDL0L._AC_UF894,1000_QL80_.jpg',
+      image: 'https://placehold.co/600x400?text=Kit+Doctor',
       category: 'Educativos',
       isNew: true
     }
@@ -50,7 +50,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen">
       <Header />
-      
+
       <main className="md:mt-16">
         {/* Hero Section - SECCIÓN 1 (sin cambio de fondo, pero texto con sombra) */}
         <div className="hero-section-wrapper">
@@ -77,12 +77,12 @@ export default function LandingPage() {
                 ¡Descubre por qué somos tu mejor elección!
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Más que juguetes, ofrecemos soluciones pensadas para negocios y familias. 
-                Queremos que cada compra sea simple, segura y beneficiosa para ti, con opciones 
+                Más que juguetes, ofrecemos soluciones pensadas para negocios y familias.
+                Queremos que cada compra sea simple, segura y beneficiosa para ti, con opciones
                 flexibles, métodos confiables y envíos que se adaptan a tus necesidades.
               </p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Ventas por Mayor y Menor */}
               <div className="bg-white rounded-xl p-8 border border-blue-100 hover:shadow-lg transition-shadow">
@@ -95,7 +95,7 @@ export default function LandingPage() {
                   ¡Compra como quieras!
                 </h3>
                 <p className="text-gray-700 text-center leading-relaxed">
-                  Ya sea que necesites grandes cantidades para tu negocio o solo un juguete especial, 
+                  Ya sea que necesites grandes cantidades para tu negocio o solo un juguete especial,
                   tenemos opciones para ventas por mayor y menor con precios que te encantarán.
                 </p>
               </div>
@@ -111,7 +111,7 @@ export default function LandingPage() {
                   ¡Paga sin complicaciones!
                 </h3>
                 <p className="text-gray-700 text-center leading-relaxed">
-                  Aceptamos pagos por QR, efectivo y depósitos bancarios para que tu experiencia 
+                  Aceptamos pagos por QR, efectivo y depósitos bancarios para que tu experiencia
                   sea rápida, segura y cómoda.
                 </p>
               </div>
@@ -128,7 +128,7 @@ export default function LandingPage() {
                   ¡Llega donde estés!
                 </h3>
                 <p className="text-gray-700 text-center leading-relaxed">
-                  Realizamos envíos confiables y rápidos exclusivamente para compras al por mayor, 
+                  Realizamos envíos confiables y rápidos exclusivamente para compras al por mayor,
                   asegurando que tu pedido llegue en perfectas condiciones.
                 </p>
               </div>
@@ -148,9 +148,9 @@ export default function LandingPage() {
                   <h3 className="text-2xl font-bold text-gray-800">VISIÓN</h3>
                 </div>
                 <p className="text-gray-700 leading-relaxed">
-                  Ser una empresa líder en el sector juguetero de Bolivia, reconocida por su compromiso con la calidad, 
-                  la atención al cliente y la modernización tecnológica. Buscamos consolidarnos como un referente en la 
-                  gestión comercial eficiente y sostenible, expandiendo nuestra presencia a nivel nacional y promoviendo 
+                  Ser una empresa líder en el sector juguetero de Bolivia, reconocida por su compromiso con la calidad,
+                  la atención al cliente y la modernización tecnológica. Buscamos consolidarnos como un referente en la
+                  gestión comercial eficiente y sostenible, expandiendo nuestra presencia a nivel nacional y promoviendo
                   el desarrollo de una cultura de juego responsable, creativa y educativa.
                 </p>
               </div>
@@ -166,11 +166,11 @@ export default function LandingPage() {
                   <h3 className="text-2xl font-bold text-gray-800">MISIÓN</h3>
                 </div>
                 <p className="text-gray-700 leading-relaxed">
-                  La Juguetería OASIS tiene como misión ofrecer juguetes de alta calidad y seguros que fomenten la 
-                  creatividad y el aprendizaje en niños de todas las edades, brindando precios competitivos y un 
-                  servicio confiable tanto para clientes minoristas como mayoristas. Nos comprometemos a proporcionar 
-                  una experiencia de compra satisfactoria, basada en la innovación, la responsabilidad y la incorporación 
-                  de tecnologías de información, que optimicen la gestión comercial y fortalezcan la relación con nuestros 
+                  La Juguetería OASIS tiene como misión ofrecer juguetes de alta calidad y seguros que fomenten la
+                  creatividad y el aprendizaje en niños de todas las edades, brindando precios competitivos y un
+                  servicio confiable tanto para clientes minoristas como mayoristas. Nos comprometemos a proporcionar
+                  una experiencia de compra satisfactoria, basada en la innovación, la responsabilidad y la incorporación
+                  de tecnologías de información, que optimicen la gestión comercial y fortalezcan la relación con nuestros
                   clientes y proveedores.
                 </p>
               </div>

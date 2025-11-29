@@ -1,0 +1,438 @@
+-- ==============================================
+-- CREACIÓN DE BASE DE DATOS PRINCIPAL
+-- ==============================================
+-- CREATE DATABASE Oasis;
+-- GO
+
+-- USE Oasis;
+-- GO
+
+-- ==============================================
+-- CREACIÓN DE ESQUEMAS
+-- ==============================================
+CREATE SCHEMA persona;
+CREATE SCHEMA clientes;
+CREATE SCHEMA proveedores;
+CREATE SCHEMA personal;
+CREATE SCHEMA productos;
+CREATE SCHEMA ventas;
+CREATE SCHEMA inventarios;
+CREATE SCHEMA seguridad;
+CREATE SCHEMA auditoria_bi;
+GO
+
+-- ==============================================
+-- ESQUEMA PERSONA
+-- ==============================================
+CREATE TABLE persona.persona (
+    persona_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre VARCHAR(100),
+    apellido VARCHAR(100),
+    documento VARCHAR(50),
+    telefono VARCHAR(20),
+    email VARCHAR(100),
+    direccion VARCHAR(200),
+    tipo_persona VARCHAR(50)
+);
+GO
+
+-- ==============================================
+-- ESQUEMA CLIENTES
+-- ==============================================
+CREATE TABLE clientes.tipo_cliente (
+    tipo_cliente_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre VARCHAR(100)
+);
+
+CREATE TABLE clientes.cliente (
+    cliente_id INT IDENTITY(1,1) PRIMARY KEY,
+    persona_id INT REFERENCES persona.persona(persona_id),
+    tipo_cliente_id INT REFERENCES clientes.tipo_cliente(tipo_cliente_id),
+    fecha_registro DATETIME,
+    estado BIT
+);
+
+CREATE TABLE clientes.datos_cliente (
+    datos_cliente_id INT IDENTITY(1,1) PRIMARY KEY,
+    cliente_id INT REFERENCES clientes.cliente(cliente_id),
+    preferencias TEXT,
+    notas TEXT
+);
+
+CREATE TABLE clientes.direccion (
+    direccion_id INT IDENTITY(1,1) PRIMARY KEY,
+    cliente_id INT REFERENCES clientes.cliente(cliente_id),
+    direccion VARCHAR(200),
+    ciudad VARCHAR(100),
+    pais VARCHAR(100)
+);
+
+CREATE TABLE clientes.contacto_cliente (
+    contacto_cliente_id INT IDENTITY(1,1) PRIMARY KEY,
+    cliente_id INT REFERENCES clientes.cliente(cliente_id),
+    nombre_contacto VARCHAR(100),
+    telefono VARCHAR(20),
+    email VARCHAR(100)
+);
+GO
+
+-- ==============================================
+-- ESQUEMA PROVEEDORES
+-- ==============================================
+CREATE TABLE proveedores.proveedor (
+    proveedor_id INT IDENTITY(1,1) PRIMARY KEY,
+    persona_id INT REFERENCES persona.persona(persona_id)
+);
+
+CREATE TABLE proveedores.proveedor_categoria (
+    proveedor_categoria_id INT IDENTITY(1,1) PRIMARY KEY,
+    proveedor_id INT REFERENCES proveedores.proveedor(proveedor_id),
+    categoria_id INT
+);
+
+CREATE TABLE proveedores.contacto_proveedor (
+    contacto_proveedor_id INT IDENTITY(1,1) PRIMARY KEY,
+    proveedor_id INT REFERENCES proveedores.proveedor(proveedor_id),
+    nombre_contacto VARCHAR(100),
+    telefono VARCHAR(20),
+    email VARCHAR(100)
+);
+
+CREATE TABLE proveedores.suministro (
+    suministro_id INT IDENTITY(1,1) PRIMARY KEY,
+    proveedor_id INT REFERENCES proveedores.proveedor(proveedor_id),
+    fecha DATETIME
+);
+
+CREATE TABLE proveedores.detalle_suministro (
+    detalle_suministro_id INT IDENTITY(1,1) PRIMARY KEY,
+    suministro_id INT REFERENCES proveedores.suministro(suministro_id),
+    producto_id INT,
+    cantidad INT,
+    precio_unitario DECIMAL(18,2)
+);
+GO
+
+-- ==============================================
+-- ESQUEMA PERSONAL
+-- ==============================================
+CREATE TABLE personal.cargo (
+    cargo_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre VARCHAR(100)
+);
+
+CREATE TABLE personal.personal (
+    personal_id INT IDENTITY(1,1) PRIMARY KEY,
+    persona_id INT REFERENCES persona.persona(persona_id),
+    cargo_id INT REFERENCES personal.cargo(cargo_id),
+    sexo VARCHAR(10)
+);
+
+CREATE TABLE personal.usuario (
+    usuario_id INT IDENTITY(1,1) PRIMARY KEY,
+    personal_id INT REFERENCES personal.personal(personal_id),
+    username VARCHAR(50),
+    password_hash VARCHAR(200),
+    estado BIT
+);
+
+CREATE TABLE personal.usuario_rol (
+    usuario_rol_id INT IDENTITY(1,1) PRIMARY KEY,
+    usuario_id INT REFERENCES personal.usuario(usuario_id),
+    rol_id INT
+);
+GO
+
+-- ==============================================
+-- ESQUEMA PRODUCTOS
+-- ==============================================
+CREATE TABLE productos.categoria (
+    categoria_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre VARCHAR(100)
+);
+
+CREATE TABLE productos.linea_producto (
+    linea_producto_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre VARCHAR(100)
+);
+
+CREATE TABLE productos.marca (
+    marca_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre VARCHAR(100)
+);
+
+CREATE TABLE productos.unidad_medida (
+    unidad_medida_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre VARCHAR(50)
+);
+
+CREATE TABLE productos.tipo_precio (
+    tipo_precio_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre VARCHAR(50)
+);
+
+CREATE TABLE productos.producto (
+    producto_id INT IDENTITY(1,1) PRIMARY KEY,
+    categoria_id INT REFERENCES productos.categoria(categoria_id),
+    linea_producto_id INT REFERENCES productos.linea_producto(linea_producto_id),
+    marca_id INT REFERENCES productos.marca(marca_id),
+    unidad_medida_id INT REFERENCES productos.unidad_medida(unidad_medida_id),
+    nombre VARCHAR(100),
+    descripcion TEXT,
+    stock_actual INT
+);
+
+CREATE TABLE productos.precio (
+    precio_id INT IDENTITY(1,1) PRIMARY KEY,
+    producto_id INT REFERENCES productos.producto(producto_id),
+    tipo_precio_id INT REFERENCES productos.tipo_precio(tipo_precio_id),
+    monto DECIMAL(18,2)
+);
+
+CREATE TABLE productos.precio_tipo_cliente (
+    precio_tipo_cliente_id INT IDENTITY(1,1) PRIMARY KEY,
+    tipo_cliente_id INT REFERENCES clientes.tipo_cliente(tipo_cliente_id),
+    precio_id INT REFERENCES productos.precio(precio_id)
+);
+GO
+
+-- ==============================================
+-- ESQUEMA VENTAS
+-- ==============================================
+CREATE TABLE ventas.pedido (
+    pedido_id INT IDENTITY(1,1) PRIMARY KEY,
+    cliente_id INT REFERENCES clientes.cliente(cliente_id),
+    fecha DATETIME,
+    estado VARCHAR(50)
+);
+
+CREATE TABLE ventas.detalle_pedido (
+    detalle_pedido_id INT IDENTITY(1,1) PRIMARY KEY,
+    pedido_id INT REFERENCES ventas.pedido(pedido_id),
+    producto_id INT REFERENCES productos.producto(producto_id),
+    cantidad INT,
+    precio_unitario DECIMAL(18,2)
+);
+
+CREATE TABLE ventas.factura (
+    factura_id INT IDENTITY(1,1) PRIMARY KEY,
+    pedido_id INT REFERENCES ventas.pedido(pedido_id),
+    fecha DATETIME,
+    total DECIMAL(18,2)
+);
+
+CREATE TABLE ventas.detalle_factura (
+    detalle_factura_id INT IDENTITY(1,1) PRIMARY KEY,
+    factura_id INT REFERENCES ventas.factura(factura_id),
+    producto_id INT REFERENCES productos.producto(producto_id),
+    cantidad INT,
+    precio_unitario DECIMAL(18,2)
+);
+
+CREATE TABLE ventas.venta (
+    venta_id INT IDENTITY(1,1) PRIMARY KEY,
+    factura_id INT REFERENCES ventas.factura(factura_id),
+    fecha DATETIME
+);
+GO
+
+-- ==============================================
+-- ESQUEMA INVENTARIOS
+-- ==============================================
+CREATE TABLE inventarios.tipo_almacen (
+    tipo_almacen_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre VARCHAR(100)
+);
+
+CREATE TABLE inventarios.almacen (
+    almacen_id INT IDENTITY(1,1) PRIMARY KEY,
+    tipo_almacen_id INT REFERENCES inventarios.tipo_almacen(tipo_almacen_id),
+    nombre VARCHAR(100),
+    ubicacion VARCHAR(200),
+    capacidad_maxima INT
+);
+
+CREATE TABLE inventarios.inventario (
+    inventario_id INT IDENTITY(1,1) PRIMARY KEY,
+    producto_id INT REFERENCES productos.producto(producto_id),
+    almacen_id INT REFERENCES inventarios.almacen(almacen_id),
+    stock INT
+);
+
+CREATE TABLE inventarios.ajuste_inventario (
+    ajuste_inventario_id INT IDENTITY(1,1) PRIMARY KEY,
+    inventario_id INT REFERENCES inventarios.inventario(inventario_id),
+    usuario_id INT REFERENCES personal.usuario(usuario_id),
+    tipo_ajuste VARCHAR(50),
+    cantidad INT,
+    fecha DATETIME
+);
+
+CREATE TABLE inventarios.transferencia_stock (
+    transferencia_stock_id INT IDENTITY(1,1) PRIMARY KEY,
+    producto_id INT REFERENCES productos.producto(producto_id),
+    almacen_origen_id INT REFERENCES inventarios.almacen(almacen_id),
+    almacen_destino_id INT REFERENCES inventarios.almacen(almacen_id),
+    cantidad INT,
+    fecha DATETIME
+);
+GO
+
+-- ==============================================
+-- ESQUEMA SEGURIDAD
+-- ==============================================
+CREATE TABLE seguridad.rol (
+    rol_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre VARCHAR(100)
+);
+
+CREATE TABLE seguridad.permiso (
+    permiso_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre VARCHAR(100)
+);
+
+CREATE TABLE seguridad.rol_permiso (
+    rol_permiso_id INT IDENTITY(1,1) PRIMARY KEY,
+    rol_id INT REFERENCES seguridad.rol(rol_id),
+    permiso_id INT REFERENCES seguridad.permiso(permiso_id)
+);
+
+CREATE TABLE seguridad.sesion_usuario (
+    sesion_id INT IDENTITY(1,1) PRIMARY KEY,
+    usuario_id INT REFERENCES personal.usuario(usuario_id),
+    fecha_inicio DATETIME,
+    fecha_fin DATETIME
+);
+
+CREATE TABLE seguridad.intento_acceso_fallido (
+    intento_id INT IDENTITY(1,1) PRIMARY KEY,
+    usuario_id INT REFERENCES personal.usuario(usuario_id),
+    fecha DATETIME,
+    ip_address VARCHAR(50)
+);
+
+CREATE TABLE seguridad.politicas_bloqueo_cuenta (
+    politica_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre_politica VARCHAR(100),
+    intentos_maximos INT DEFAULT 3,
+    tiempo_bloqueo_minutos INT DEFAULT 30,
+    bloqueo_definitivo BIT DEFAULT 0,
+    tipo_bloqueo VARCHAR(50) DEFAULT 'TEMPORAL',
+    requiere_desbloqueo_admin BIT DEFAULT 0,
+    estado BIT DEFAULT 1,
+    fecha_creacion DATETIME DEFAULT GETDATE(),
+    usuario_creador INT REFERENCES personal.usuario(usuario_id)
+);
+
+CREATE TABLE seguridad.configuracion_seguridad (
+    config_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre_parametro VARCHAR(100) UNIQUE,
+    valor_parametro VARCHAR(500),
+    descripcion TEXT,
+    tipo_parametro VARCHAR(50),
+    categoria VARCHAR(100),
+    requiere_reinicio BIT DEFAULT 0,
+    fecha_modificacion DATETIME DEFAULT GETDATE(),
+    usuario_modificador INT REFERENCES personal.usuario(usuario_id)
+);
+
+CREATE TABLE seguridad.eventos_bloqueo_usuario (
+    evento_bloqueo_id INT IDENTITY(1,1) PRIMARY KEY,
+    usuario_afectado_id INT REFERENCES personal.usuario(usuario_id),
+    politica_aplicada_id INT REFERENCES seguridad.politicas_bloqueo_cuenta(politica_id),
+    tipo_evento VARCHAR(50),
+    motivo VARCHAR(200),
+    fecha_evento DATETIME DEFAULT GETDATE(),
+    fecha_desbloqueo DATETIME,
+    usuario_desbloquea INT REFERENCES personal.usuario(usuario_id),
+    intentos_acumulados INT DEFAULT 0,
+    estado VARCHAR(50) DEFAULT 'ACTIVO',
+    ip_origen VARCHAR(50),
+    observaciones TEXT
+);
+
+CREATE TABLE seguridad.alertas_seguridad (
+    alerta_seguridad_id INT IDENTITY(1,1) PRIMARY KEY,
+    tipo_alerta VARCHAR(100),
+    severidad VARCHAR(50) DEFAULT 'MEDIA',
+    titulo VARCHAR(200),
+    descripcion TEXT,
+    usuario_involucrado INT REFERENCES personal.usuario(usuario_id),
+    tabla_afectada VARCHAR(100),
+    registro_afectado_id INT,
+    fecha_deteccion DATETIME DEFAULT GETDATE(),
+    estado VARCHAR(50) DEFAULT 'PENDIENTE',
+    usuario_revisor INT REFERENCES personal.usuario(usuario_id),
+    fecha_revision DATETIME,
+    accion_tomada TEXT,
+    riesgo_estimado VARCHAR(50),
+    requiere_accion_inmediata BIT DEFAULT 0
+);
+GO
+
+-- ==============================================
+-- ESQUEMA AUDITORÍA Y BI
+-- ==============================================
+CREATE TABLE auditoria_bi.reporte (
+    reporte_id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre VARCHAR(100),
+    descripcion TEXT
+);
+
+CREATE TABLE auditoria_bi.reporte_campo_config (
+    campo_config_id INT IDENTITY(1,1) PRIMARY KEY,
+    reporte_id INT REFERENCES auditoria_bi.reporte(reporte_id),
+    campo VARCHAR(100)
+);
+
+CREATE TABLE auditoria_bi.reporte_filtro_config (
+    filtro_config_id INT IDENTITY(1,1) PRIMARY KEY,
+    reporte_id INT REFERENCES auditoria_bi.reporte(reporte_id),
+    filtro VARCHAR(100)
+);
+
+CREATE TABLE auditoria_bi.historial_generacion_reporte (
+    historial_reporte_id INT IDENTITY(1,1) PRIMARY KEY,
+    reporte_id INT REFERENCES auditoria_bi.reporte(reporte_id),
+    fecha DATETIME,
+    usuario_id INT REFERENCES personal.usuario(usuario_id)
+);
+
+CREATE TABLE auditoria_bi.alerta_configuracion (
+    alerta_config_id INT IDENTITY(1,1) PRIMARY KEY,
+    tipo_alerta VARCHAR(100),
+    umbral INT,
+    prioridad VARCHAR(50),
+    activa BIT
+);
+
+CREATE TABLE auditoria_bi.historial_alerta (
+    historial_alerta_id INT IDENTITY(1,1) PRIMARY KEY,
+    alerta_config_id INT REFERENCES auditoria_bi.alerta_configuracion(alerta_config_id),
+    producto_id INT REFERENCES productos.producto(producto_id),
+    mensaje TEXT,
+    fecha_generacion DATETIME,
+    estado VARCHAR(50),
+    usuario_resolutor_id INT REFERENCES personal.usuario(usuario_id),
+    fecha_resolucion DATETIME
+);
+
+CREATE TABLE auditoria_bi.historial_cambio_precio (
+    historial_precio_id INT IDENTITY(1,1) PRIMARY KEY,
+    producto_id INT REFERENCES productos.producto(producto_id),
+    usuario_id INT REFERENCES personal.usuario(usuario_id),
+    precio_antiguo DECIMAL(18,2),
+    precio_nuevo DECIMAL(18,2),
+    fecha DATETIME
+);
+
+CREATE TABLE auditoria_bi.bitacora_actividad_general (
+    bitacora_id INT IDENTITY(1,1) PRIMARY KEY,
+    usuario_id INT REFERENCES personal.usuario(usuario_id),
+    accion VARCHAR(200),
+    tabla_afectada VARCHAR(100),
+    registro_afectado_id INT,
+    fecha DATETIME,
+    ip_address VARCHAR(50)
+);
+GO

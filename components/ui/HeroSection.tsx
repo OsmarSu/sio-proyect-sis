@@ -21,20 +21,20 @@ export default function HeroSection({
   backgroundImage = '/api/placeholder/1920/800'
 }: HeroSectionProps) {
   return (
-    <section 
+    <section
       className="relative h-screen bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
-      <img 
-    src="/BANER OASIS.png" 
-    alt="Banner" 
-    className="absolute inset-0 w-full h-full object-cover"
-  />
-  
-  {/* Overlay oscuro */}
-  <div className="absolute inset-0 bg-black/40"></div>
-  
-  {/* Contenido existente */}
+      <img
+        src="/banner_oasis.png"
+        alt="Banner"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+
+      {/* Overlay oscuro */}
+      <div className="absolute inset-0 bg-black/40"></div>
+
+      {/* Contenido existente */}
       <div className="relative z-10 h-full flex items-center justify-center text-center text-white">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">

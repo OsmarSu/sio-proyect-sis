@@ -9,7 +9,7 @@ import { Product, FilterOptions } from './types/product';
 
 const handleAddToCart = (productId: number) => {
   // Permitir agregar al carrito sin login, pero mostrar mensaje si no está logueado
-  
+
   // Lógica para agregar al carrito
 };
 // Datos mock de productos (igual que antes)
@@ -21,7 +21,7 @@ const mockProducts: Product[] = [
     originalPrice: 34.99,
     category: 'Construcción',
     ageRange: '6-8 años',
-    image: '/api/placeholder/300/300',
+    image: 'https://placehold.co/300x300?text=Lego+Classic',
     description: 'Set de construcción creativa con piezas coloridas para horas de diversión',
     stock: 15,
     rating: 4.8,
@@ -34,12 +34,33 @@ const mockProducts: Product[] = [
     price: 89.99,
     category: 'Muñecas',
     ageRange: '3-5 años',
-    image: '/api/placeholder/300/300',
+    image: 'https://placehold.co/300x300?text=Barbie+Dreamhouse',
     description: 'Casa de sueños con accesorios y muebles para muñecas Barbie',
     stock: 8,
     rating: 4.5
   },
-  // ... (los demás productos igual)
+  {
+    id: 3,
+    name: 'Hot Wheels Pista Extrema',
+    price: 45.99,
+    category: 'Vehículos',
+    ageRange: '4-8 años',
+    image: 'https://placehold.co/300x300?text=Hot+Wheels',
+    description: 'Pista de carreras con looping y lanzador de alta velocidad',
+    stock: 12,
+    rating: 4.7
+  },
+  {
+    id: 4,
+    name: 'Kit Médico Juguete',
+    price: 24.99,
+    category: 'Educativos',
+    ageRange: '3-6 años',
+    image: 'https://placehold.co/300x300?text=Kit+Medico',
+    description: 'Maletín con instrumentos médicos de juguete para juego de roles',
+    stock: 20,
+    rating: 4.6
+  }
 ];
 
 export default function CatalogoPage() {
@@ -57,11 +78,11 @@ export default function CatalogoPage() {
   const filteredProducts = useMemo(() => {
     let filtered = mockProducts.filter(product => {
       const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           product.description.toLowerCase().includes(searchQuery.toLowerCase());
-      
+        product.description.toLowerCase().includes(searchQuery.toLowerCase());
+
       const matchesCategory = !filters.category || product.category === filters.category;
       const matchesAgeRange = !filters.ageRange || product.ageRange === filters.ageRange;
-      
+
       return matchesSearch && matchesCategory && matchesAgeRange;
     });
 
@@ -99,7 +120,7 @@ export default function CatalogoPage() {
           <p className="text-lg text-gray-600 mb-8">
             Descubre los mejores juguetes para todas las edades
           </p>
-          
+
           {/* Barra de búsqueda */}
           <SearchBar onSearch={handleSearch} />
         </div>
@@ -128,6 +149,7 @@ export default function CatalogoPage() {
                 {filteredProducts.map((product) => (
                   <ProductCard
                     key={product.id}
+                    id={product.id.toString()}
                     name={product.name}
                     description={product.description}
                     price={product.price}

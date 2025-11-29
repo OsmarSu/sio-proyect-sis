@@ -1,19 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react"; // Importación clave para manejar el estado
 import { useAuth } from "@/contexts/AuthContext";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 
 export default function LoginPage() {
   const { login } = useAuth();
+  // Usamos useSession directamente para verificar el estado real de la cookie
+  const { status } = useSession();
+  const router = useRouter();
+
   const [email, setEmail] = useState("admin@oasis.com");
   const [password, setPassword] = useState("password123");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  // --- LÓGICA DE PROTECCIÓN Y REDIRECCIÓN ---
+  useEffect(() => {
+    // Si NextAuth confirma que estamos autenticados, nos vamos al dashboard
+    if (status === "authenticated") {
+      router.replace("/dashboard");
+    }
+  }, [status, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,37 +36,74 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
+      // No necesitamos redirigir aquí manualmente,
+      // el cambio de estado de sesión disparará el useEffect de arriba.
     } catch (err: any) {
       setError(err.message || "Error al iniciar sesión. Inténtalo de nuevo.");
-    } finally {
       setIsLoading(false);
     }
   };
 
-  // Nueva función para limpiar los campos
   const handleClear = () => {
     setEmail("");
     setPassword("");
     setError(null);
   };
 
+  if (status === "loading" || status === "authenticated") {
+    return (
+      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white">
+        {/* Fondo degradado suave (el mismo de tu login para consistencia) */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50" />
+
+        <div className="relative z-10 flex flex-col items-center">
+          {/* Logo con efecto de brillo/resplandor */}
+          <div className="relative mb-6">
+            <div className="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-20 animate-pulse"></div>
+            <Image
+              src="/sis_oasis.png"
+              alt="Cargando SIO"
+              width={80} // Hacemos el logo un poco más grande
+              height={80}
+              className="rounded-full relative shadow-2xl"
+              priority
+            />
+          </div>
+
+          {/* Spinner Personalizado */}
+          <div className="flex items-center gap-2 mb-4">
+            <div className="h-3 w-3 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+            <div className="h-3 w-3 bg-purple-600 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+            <div className="h-3 w-3 bg-pink-600 rounded-full animate-bounce"></div>
+          </div>
+
+          <h2 className="text-2xl font-bold text-gray-800 tracking-tight">
+            Bienvenido a Oasis
+          </h2>
+          <p className="text-gray-500 font-medium mt-1 animate-pulse">
+            Preparando tu entorno de trabajo...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // --- FORMULARIO DE LOGIN (Solo se ve si status === "unauthenticated") ---
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1 flex items-center justify-center bg-gray-50 relative overflow-hidden pt-16">
-
         <div className="absolute top-0 left-0 z-0 h-full w-full bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50" />
 
         <div className="w-full max-w-md relative z-10 px-8 py-12">
-          
           <div className="flex flex-col items-center mb-8">
             <div className="flex items-center gap-3 mb-4">
               <Image
-                src="/sis_oasis.png" 
+                src="/sis_oasis.png"
                 alt="SIO"
-                width={56} 
+                width={56}
                 height={56}
-                className="rounded-full object-cover" 
+                className="rounded-full object-cover"
                 priority
               />
               <span className="text-gray-900 font-bold text-2xl">SIO</span>
@@ -172,7 +223,7 @@ export default function LoginPage() {
               >
                 {isLoading ? "Iniciando..." : "Iniciar Sesión"}
               </button>
-              
+
               <button
                 type="button"
                 onClick={handleClear}
