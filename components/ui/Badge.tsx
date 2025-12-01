@@ -1,31 +1,37 @@
-// components/ui/Badge.tsx
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
 
-import React from 'react';
+import { cn } from "@/lib/utils"
 
-// Estas son las variantes de color que puede tener
-type BadgeVariant = 'default' | 'primary' | 'success' | 'danger';
+const badgeVariants = cva(
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  {
+    variants: {
+      variant: {
+        default:
+          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+        secondary:
+          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive:
+          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+        outline: "text-foreground",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
 
-// Esta es la "forma" de las props que el componente espera
-interface BadgeProps {
-  children: React.ReactNode;
-  variant?: BadgeVariant; // El '?' lo hace opcional
-  className?: string;     // El '?' lo hace opcional
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
+function Badge({ className, variant, ...props }: BadgeProps) {
+  return (
+    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+  )
 }
 
-const Badge = ({ children, variant = 'default', className = '' }: BadgeProps) => {
-  const variantStyles: Record<BadgeVariant, string> = {
-    default: 'bg-neutral-700/50 text-gray-300',
-    primary: 'bg-blue-900 text-blue-300',
-    success: 'bg-green-900 text-green-300',
-    danger: 'bg-red-900 text-red-300',
-  };
-  const baseStyles = 'text-xs font-medium px-2.5 py-0.5 rounded-full inline-block';
-
-  return (
-    <span className={`${baseStyles} ${variantStyles[variant]} ${className}`}>
-      {children}
-    </span>
-  );
-};
-
+export { Badge, badgeVariants }
 export default Badge;

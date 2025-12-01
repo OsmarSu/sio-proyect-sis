@@ -1,21 +1,32 @@
-// components/layout/Sidebar.tsx
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React from 'react';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Sidebar = () => {
   const pathname = usePathname();
-  // Estado para controlar la expansión del submenú de Reportes
-  const [reportsExpanded, setReportsExpanded] = useState(pathname.startsWith('/dashboard/reportes'));
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  // ✅ ESTADO DINÁMICO: Controla qué menús están abiertos
+  // Inicializamos basados en la URL actual para que al recargar siga abierto donde estabas
+  const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({
+    Productos: pathname.startsWith('/dashboard/productos'),
+    Reportes: pathname.startsWith('/dashboard/reportes'),
+  });
 
   // Colores de tu paleta
   const COLOR_PRIMARY = '#5556EE';
   const COLOR_SECONDARY = '#8150CE';
-  const COLOR_ACCENT = '#2EB4D1'; // Usado para el resaltado del submenú
+  const COLOR_ACCENT = '#2EB4D1';
+
+  // Función para alternar menús
+  const toggleMenu = (title: string) => {
+    setExpandedMenus((prev) => ({
+      ...prev,
+      [title]: !prev[title],
+    }));
+  };
 
   const menuItems = [
     {
@@ -35,12 +46,13 @@ const Sidebar = () => {
         </svg>
       ),
       href: '/dashboard/productos',
-      // Aquí podrías añadir sub-items para productos si los tuvieras (ej. Categorías, Marcas)
-      // children: [
-      //   { title: 'Listado', href: '/dashboard/productos' },
-      //   { title: 'Categorías', href: '/dashboard/productos/categorias' },
-      //   { title: 'Marcas', href: '/dashboard/productos/marcas' },
-      // ]
+      // ✅ SUB-MÓDULOS ACTIVADOS
+      children: [
+        { title: 'Catálogo', href: '/dashboard/productos' }, 
+        { title: 'Nuevo Producto', href: '/dashboard/productos/nuevo' },
+        { title: 'Categorías', href: '/dashboard/productos/categorias' },
+        { title: 'Marcas', href: '/dashboard/productos/marcas' },
+      ],
     },
     {
       title: 'Compras',
@@ -55,7 +67,7 @@ const Sidebar = () => {
       title: 'Inventario',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
         </svg>
       ),
       href: '/dashboard/inventario',
@@ -69,7 +81,7 @@ const Sidebar = () => {
       ),
       href: '/dashboard/ventas',
     },
-    { // Opción de Reportes con sub-menú
+    {
       title: 'Reportes',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,7 +110,7 @@ const Sidebar = () => {
     <aside
       className={`${
         isCollapsed ? 'w-20' : 'w-64'
-      } bg-white border-r border-gray-200 transition-all duration-300 ease-in-out flex flex-col shadow-sm`}
+      } bg-white border-r border-gray-200 transition-all duration-300 ease-in-out flex flex-col shadow-sm h-screen sticky top-0`}
     >
       {/* Logo y Toggle */}
       <div className="p-6 flex items-center justify-between border-b border-gray-200">
@@ -130,42 +142,37 @@ const Sidebar = () => {
           title={isCollapsed ? 'Expandir' : 'Contraer'}
         >
           <svg
-            className={`w-5 h-5 text-gray-600 group-hover:text-[${COLOR_PRIMARY}] transition-all ${ // Usamos COLOR_PRIMARY para el hover del toggle
+            className={`w-5 h-5 text-gray-600 group-hover:text-[${COLOR_PRIMARY}] transition-all ${
               isCollapsed ? 'rotate-180' : ''
             }`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
           </svg>
         </button>
       </div>
 
       {/* Menú de navegación */}
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto custom-scrollbar">
         {menuItems.map((item) => (
           <React.Fragment key={item.href}>
-            <div // Usamos un div para el item principal que puede tener sub-menú
+            <div
               className={`relative ${
                 item.children ? 'cursor-pointer' : ''
               }`}
             >
               <Link
-                href={item.href}
+                href={item.children ? '#' : item.href} // Si tiene hijos, el link padre no navega, solo colapsa
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${
                   isActive(item.href)
                     ? `bg-[${COLOR_PRIMARY}]/10 text-[${COLOR_PRIMARY}] shadow-sm`
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
                 onClick={item.children ? (e) => {
-                    e.preventDefault(); // Evita la navegación directa si tiene hijos
-                    setReportsExpanded(!reportsExpanded); // Toggle del submenú
+                    e.preventDefault(); 
+                    toggleMenu(item.title); // ✅ Usamos la función genérica
                 } : undefined}
               >
                 {/* Indicador lateral para item activo */}
@@ -182,14 +189,14 @@ const Sidebar = () => {
                 </span>
 
                 {!isCollapsed && (
-                  <span className="font-medium text-sm">{item.title}</span>
+                  <span className="font-medium text-sm flex-1">{item.title}</span>
                 )}
 
-                {/* Ícono de flecha para desplegar */}
+                {/* Ícono de flecha para desplegar (solo si no está colapsado y tiene hijos) */}
                 {!isCollapsed && item.children && (
                   <svg
-                    className={`w-4 h-4 ml-auto text-gray-400 transition-transform duration-200 ${
-                      reportsExpanded ? 'rotate-180' : ''
+                    className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
+                      expandedMenus[item.title] ? 'rotate-180' : ''
                     }`}
                     fill="none"
                     stroke="currentColor"
@@ -201,32 +208,30 @@ const Sidebar = () => {
 
                 {/* Tooltip para modo colapsado */}
                 {isCollapsed && (
-                  <div className="absolute left-full ml-2 px-3 py-1 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap">
+                  <div className="absolute left-full ml-2 px-3 py-1 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
                     {item.title}
                   </div>
                 )}
               </Link>
             </div>
 
-            {/* Sub-menú para Reportes */}
-            {!isCollapsed && item.children && reportsExpanded && (
-              <div className="ml-6 border-l border-gray-200 pl-3 space-y-1 mt-1">
+            {/* Sub-menú Genérico */}
+            {!isCollapsed && item.children && expandedMenus[item.title] && (
+              <div className="ml-6 border-l border-gray-200 pl-3 space-y-1 mt-1 animate-in slide-in-from-top-1 fade-in-20 duration-200">
                 {item.children.map((subItem) => (
                   <Link
                     key={subItem.href}
                     href={subItem.href}
                     className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 group relative ${
                       pathname === subItem.href
-                        ? `bg-[${COLOR_ACCENT}]/10 text-[${COLOR_ACCENT}]` // Usamos COLOR_ACCENT para sub-items activos
+                        ? `bg-[${COLOR_ACCENT}]/10 text-[${COLOR_ACCENT}] font-medium`
                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                     }`}
                   >
-                    {pathname === subItem.href && ( // Indicador para sub-item activo
+                    {pathname === subItem.href && (
                       <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[${COLOR_ACCENT}] rounded-r-full`} />
                     )}
-                    <span className={`text-sm ${
-                        pathname === subItem.href ? `text-[${COLOR_ACCENT}]` : 'text-gray-500 group-hover:text-gray-700'
-                    }`}>
+                    <span className="text-sm">
                       {subItem.title}
                     </span>
                   </Link>
@@ -242,32 +247,13 @@ const Sidebar = () => {
         <div className="border-t border-gray-200" />
       </div>
 
-      {/* Sección de accesos rápidos */}
-      {!isCollapsed && (
-        <div className="p-4 space-y-2">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-2">
-            Accesos Rápidos
-          </p>
-          {/* La opción "Ver como Cliente" se mantiene comentada */}
-          <Link
-            href="/"
-            className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors group"
-          >
-            <svg className="w-4 h-4 text-gray-400 group-hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-            <span className="text-sm">Ir al Inicio</span>
-          </Link>
-        </div>
-      )}
-
       {/* Usuario */}
       <div className="p-4 border-t border-gray-200 bg-gray-50/50">
         <div className={`flex items-center gap-3 ${
           isCollapsed ? 'justify-center' : ''
         }`}>
-          <div className="w-10 h-10 bg-gradient-to-br from-[${COLOR_PRIMARY}] to-[${COLOR_SECONDARY}] rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
-            <span className="text-white font-semibold text-sm">AD</span>
+          <div className={`w-10 h-10 bg-gradient-to-br from-[${COLOR_PRIMARY}] to-[${COLOR_SECONDARY}] rounded-full flex items-center justify-center flex-shrink-0 shadow-md text-white font-semibold text-sm`}>
+            AD
           </div>
 
           {!isCollapsed && (
