@@ -1,10 +1,23 @@
 // components/layout/Sidebar.tsx
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import React from 'react';
-import { useState } from 'react';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState, ReactElement } from "react";
+// 1. Importamos tu icono local
+import PriceTagIcon from "@/components/icons/PriceTagIcon";
+
+type SubMenuItem = {
+  title: string;
+  href: string;
+};
+
+type MenuItem = {
+  title: string;
+  icon: ReactElement;
+  href?: string;
+  submenu?: SubMenuItem[];
+};
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -42,8 +55,19 @@ const Sidebar = () => {
         { title: 'Marcas', href: '/dashboard/productos/marcas' },
       ],
     },
-    { // NUEVO: Módulo de Clientes (lo agregamos como ítem principal, no desplegable por ahora)
-      title: 'Clientes',
+    {
+      title: "Precios",
+      // Quitamos el href directo para que no navegue, sino que abra el menú
+      icon: <PriceTagIcon className="w-5 h-5" />, 
+      submenu: [
+        { title: "Listado de Precios", href: "/dashboard/precios/listado" },
+        { title: "Actualización Masiva", href: "/dashboard/precios/masiva" },
+        { title: "Historial", href: "/dashboard/precios/historial" }, // Nombre corregido
+      ],
+    },
+    {
+      title: "Proveedores",
+      href: "/dashboard/proveedores",
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -294,6 +318,26 @@ const Sidebar = () => {
             Accesos Rápidos
           </p>
           <Link
+            href="/cliente/catalogo"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors group"
+          >
+            <svg
+              className="w-4 h-4 text-gray-400 group-hover:text-gray-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+              />
+            </svg>
+            <span className="text-sm">Ver como Cliente</span>
+          </Link>
+
+          <Link
             href="/"
             className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors group"
           >
@@ -304,13 +348,14 @@ const Sidebar = () => {
           </Link>
         </div>
       )}
-
-      {/* Usuario */}
-      <div className="p-4 border-t border-gray-200 bg-gray-50/50">
-        <div className={`flex items-center gap-3 ${
-          isCollapsed ? 'justify-center' : ''
-        }`}>
-          <div className="w-10 h-10 bg-gradient-to-br from-[${COLOR_PRIMARY}] to-[${COLOR_SECONDARY}] rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
+      {/* Footer de usuario */}
+      <div className="p-4 border-t border-gray-200 bg-gray-50/50 mt-auto">
+        <div
+          className={`flex items-center gap-3 ${
+            isCollapsed ? "justify-center" : ""
+          }`}
+        >
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
             <span className="text-white font-semibold text-sm">AD</span>
           </div>
 
