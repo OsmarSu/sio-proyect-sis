@@ -15,7 +15,7 @@ type MenuItem = {
   title: string;
   icon: ReactElement;
   href?: string;
-  submenu?: SubMenuItem[];
+  children?: SubMenuItem[];
 };
 
 const Sidebar = () => {
@@ -31,6 +31,7 @@ const Sidebar = () => {
     Usuarios: pathname.startsWith('/dashboard/usuarios'),
     Productos: pathname.startsWith('/dashboard/productos'),
     Reportes: pathname.startsWith('/dashboard/reportes'),
+    Precios: pathname.startsWith('/dashboard/precios'), // Added Precios
   });
 
   // Colores de tu paleta
@@ -46,7 +47,7 @@ const Sidebar = () => {
     }));
   };
 
-  const menuItems = [
+  const menuItems: MenuItem[] = [
     {
       title: 'Inicio',
       icon: (
@@ -89,7 +90,7 @@ const Sidebar = () => {
       title: "Precios",
       // Quitamos el href directo para que no navegue, sino que abra el menú
       icon: <PriceTagIcon className="w-5 h-5" />,
-      submenu: [
+      children: [
         { title: "Listado de Precios", href: "/dashboard/precios/listado" },
         { title: "Actualización Masiva", href: "/dashboard/precios/masiva" },
         { title: "Historial", href: "/dashboard/precios/historial" }, // Nombre corregido
@@ -207,21 +208,20 @@ const Sidebar = () => {
       {/* Menú de navegación */}
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto custom-scrollbar">
         {menuItems.map((item) => (
-          <React.Fragment key={item.href}>
+          <React.Fragment key={item.title}>
             <div
               className={`relative ${item.children ? 'cursor-pointer' : ''
                 }`}
             >
               <Link
                 href={item.children ? '#' : item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${
-                  isActive(item.href)
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${isActive(item.href)
                     ? `bg-[${COLOR_PRIMARY}]/10 text-[${COLOR_PRIMARY}] shadow-sm`
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
+                  }`}
                 onClick={item.children ? (e) => {
-                    e.preventDefault(); 
-                    toggleMenu(item.title);
+                  e.preventDefault();
+                  toggleMenu(item.title);
                 } : undefined}
               >
                 {/* Indicador lateral para item activo */}

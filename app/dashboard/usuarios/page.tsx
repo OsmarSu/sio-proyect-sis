@@ -2,7 +2,6 @@
 import { getUsuarios } from '@/actions/get-usuarios';
 import { getCargos } from '@/actions/get-cargos';
 import { UsersGrid } from '@/components/users/users-grid';
-import Footer from '@/components/layout/Footer';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,13 +33,12 @@ export default async function UsuariosPage() {
       </div>
 
       {/* Users Grid */}
-      <UsersGrid 
-        initialUsers={users} 
+      <UsersGrid
+        initialUsers={users}
         cargos={cargos}
       />
 
-      {/* Footer */}
-      <Footer />
+
     </div>
   );
 }

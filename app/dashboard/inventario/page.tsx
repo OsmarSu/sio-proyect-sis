@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 
-const DashboardHomePage = () => {
+const DashboardHomeContent = () => {
   return (
     <div className="flex flex-col gap-6">
+      {/* ... contenido existente ... */}
       {/* Encabezado con icono grande */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
         <div className="flex items-start justify-between">
@@ -22,7 +23,7 @@ const DashboardHomePage = () => {
               </p>
             </div>
           </div>
-          
+
           <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300 transform hover:scale-105">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -231,4 +232,10 @@ const DashboardHomePage = () => {
   );
 };
 
-export default DashboardHomePage;
+export default function DashboardHomePage() {
+  return (
+    <Suspense fallback={<div>Cargando panel...</div>}>
+      <DashboardHomeContent />
+    </Suspense>
+  );
+}

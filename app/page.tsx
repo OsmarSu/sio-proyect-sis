@@ -4,7 +4,13 @@ import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import HeroSection from '../components/ui/HeroSection';
 
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+
 export default function LandingPage() {
+  const { data: session } = useSession();
+  const router = useRouter();
+
   // Productos destacados con imágenes reales
   const featuredProducts = [
     {
@@ -47,10 +53,14 @@ export default function LandingPage() {
     window.location.href = '/cliente/catalogo';
   };
 
+  const handleGoToDashboard = () => {
+    router.push('/dashboard');
+  };
+
   return (
     <div className="min-h-screen">
       <Header />
-      
+
       <main className="md:mt-16">
         {/* Hero Section - SECCIÓN 1 (sin cambio de fondo, pero texto con sombra) */}
         <div className="hero-section-wrapper">
@@ -67,6 +77,21 @@ export default function LandingPage() {
             onPrimaryClick={handleExploreProducts}
             onSecondaryClick={handleExploreProducts}
           />
+          {/* Botón Flotante o Adicional para Personal */}
+          {/* @ts-ignore */}
+          {session?.user?.role !== 'CLIENTE' && session?.user && (
+            <div className="absolute top-24 right-8 z-50 animate-in fade-in slide-in-from-top-4 duration-700">
+              <button
+                onClick={handleGoToDashboard}
+                className="bg-white/90 backdrop-blur-md text-indigo-700 px-6 py-3 rounded-full font-bold shadow-lg border border-indigo-100 hover:bg-indigo-50 hover:scale-105 transition-all flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+                Ir al Panel Administrativo
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Features Section - SECCIÓN 2 - Fondo Rosa Suave */}
@@ -77,12 +102,12 @@ export default function LandingPage() {
                 ¡Descubre por qué somos tu mejor elección!
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Más que juguetes, ofrecemos soluciones pensadas para negocios y familias. 
-                Queremos que cada compra sea simple, segura y beneficiosa para ti, con opciones 
+                Más que juguetes, ofrecemos soluciones pensadas para negocios y familias.
+                Queremos que cada compra sea simple, segura y beneficiosa para ti, con opciones
                 flexibles, métodos confiables y envíos que se adaptan a tus necesidades.
               </p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Ventas por Mayor y Menor */}
               <div className="bg-white rounded-xl p-8 border border-blue-100 hover:shadow-lg transition-shadow">
@@ -95,7 +120,7 @@ export default function LandingPage() {
                   ¡Compra como quieras!
                 </h3>
                 <p className="text-gray-700 text-center leading-relaxed">
-                  Ya sea que necesites grandes cantidades para tu negocio o solo un juguete especial, 
+                  Ya sea que necesites grandes cantidades para tu negocio o solo un juguete especial,
                   tenemos opciones para ventas por mayor y menor con precios que te encantarán.
                 </p>
               </div>
@@ -111,7 +136,7 @@ export default function LandingPage() {
                   ¡Paga sin complicaciones!
                 </h3>
                 <p className="text-gray-700 text-center leading-relaxed">
-                  Aceptamos pagos por QR, efectivo y depósitos bancarios para que tu experiencia 
+                  Aceptamos pagos por QR, efectivo y depósitos bancarios para que tu experiencia
                   sea rápida, segura y cómoda.
                 </p>
               </div>
@@ -128,7 +153,7 @@ export default function LandingPage() {
                   ¡Llega donde estés!
                 </h3>
                 <p className="text-gray-700 text-center leading-relaxed">
-                  Realizamos envíos confiables y rápidos exclusivamente para compras al por mayor, 
+                  Realizamos envíos confiables y rápidos exclusivamente para compras al por mayor,
                   asegurando que tu pedido llegue en perfectas condiciones.
                 </p>
               </div>
@@ -148,9 +173,9 @@ export default function LandingPage() {
                   <h3 className="text-2xl font-bold text-gray-800">VISIÓN</h3>
                 </div>
                 <p className="text-gray-700 leading-relaxed">
-                  Ser una empresa líder en el sector juguetero de Bolivia, reconocida por su compromiso con la calidad, 
-                  la atención al cliente y la modernización tecnológica. Buscamos consolidarnos como un referente en la 
-                  gestión comercial eficiente y sostenible, expandiendo nuestra presencia a nivel nacional y promoviendo 
+                  Ser una empresa líder en el sector juguetero de Bolivia, reconocida por su compromiso con la calidad,
+                  la atención al cliente y la modernización tecnológica. Buscamos consolidarnos como un referente en la
+                  gestión comercial eficiente y sostenible, expandiendo nuestra presencia a nivel nacional y promoviendo
                   el desarrollo de una cultura de juego responsable, creativa y educativa.
                 </p>
               </div>
@@ -166,11 +191,11 @@ export default function LandingPage() {
                   <h3 className="text-2xl font-bold text-gray-800">MISIÓN</h3>
                 </div>
                 <p className="text-gray-700 leading-relaxed">
-                  La Juguetería OASIS tiene como misión ofrecer juguetes de alta calidad y seguros que fomenten la 
-                  creatividad y el aprendizaje en niños de todas las edades, brindando precios competitivos y un 
-                  servicio confiable tanto para clientes minoristas como mayoristas. Nos comprometemos a proporcionar 
-                  una experiencia de compra satisfactoria, basada en la innovación, la responsabilidad y la incorporación 
-                  de tecnologías de información, que optimicen la gestión comercial y fortalezcan la relación con nuestros 
+                  La Juguetería OASIS tiene como misión ofrecer juguetes de alta calidad y seguros que fomenten la
+                  creatividad y el aprendizaje en niños de todas las edades, brindando precios competitivos y un
+                  servicio confiable tanto para clientes minoristas como mayoristas. Nos comprometemos a proporcionar
+                  una experiencia de compra satisfactoria, basada en la innovación, la responsabilidad y la incorporación
+                  de tecnologías de información, que optimicen la gestión comercial y fortalezcan la relación con nuestros
                   clientes y proveedores.
                 </p>
               </div>

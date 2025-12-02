@@ -1,22 +1,22 @@
 // app/dashboard/reportes/inventario/page.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { AlertCircle } from 'lucide-react';
 
 // Función de traducción para los rangos de fecha
 const translateDateRange = (range: string) => {
-    switch (range) {
-      case 'today': return 'Hoy';
-      case 'week': return 'Esta Semana';
-      case 'month': return 'Este Mes';
-      case 'year': return 'Este Año';
-      case 'custom': return 'Personalizado';
-      default: return range;
-    }
-  };
+  switch (range) {
+    case 'today': return 'Hoy';
+    case 'week': return 'Esta Semana';
+    case 'month': return 'Este Mes';
+    case 'year': return 'Este Año';
+    case 'custom': return 'Personalizado';
+    default: return range;
+  }
+};
 
 function InventarioReportPage() {
   const searchParams = useSearchParams();
@@ -33,22 +33,22 @@ function InventarioReportPage() {
 
   useEffect(() => {
     const fetchReportData = async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-            const res = await fetch(`/api/reports/inventario?range=${dateRange}`);
-            if (!res.ok) {
-                const errorData = await res.json();
-                throw new Error(errorData.error || 'Error al cargar los datos del reporte de inventario.');
-            }
-            const data = await res.json();
-            setReportData(data);
-        } catch (err: any) {
-            setError(err.message);
-            console.error('Error fetching inventario report data:', err);
-        } finally {
-            setIsLoading(false);
+      setIsLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`/ api / reports / inventario ? range = ${dateRange} `);
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || 'Error al cargar los datos del reporte de inventario.');
         }
+        const data = await res.json();
+        setReportData(data);
+      } catch (err: any) {
+        setError(err.message);
+        console.error('Error fetching inventario report data:', err);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchReportData();
   }, [dateRange]);
@@ -62,7 +62,7 @@ function InventarioReportPage() {
   }
 
   if (!reportData || (!reportData.stockPorCategoria?.length && !reportData.productosBajoStock?.length && !reportData.inventoryMovements?.length)) {
-      return <div className="text-center p-8 text-gray-600">No hay datos disponibles para el reporte de inventario.</div>;
+    return <div className="text-center p-8 text-gray-600">No hay datos disponibles para el reporte de inventario.</div>;
   }
 
   return (
@@ -121,31 +121,31 @@ function InventarioReportPage() {
 
       {reportData.inventoryMovements?.length > 0 && (
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mt-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Historial de Movimientos de Inventario</h3>
-            <div className="overflow-x-auto">
-                <table className="w-full">
-                    <thead>
-                        <tr className="border-b border-gray-200">
-                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Fecha/Hora</th>
-                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Producto</th>
-                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Tipo</th>
-                            <th className="text-center py-3 px-4 font-semibold text-gray-700">Cantidad</th>
-                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Usuario</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {reportData.inventoryMovements.map((mov: any, index: number) => (
-                            <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
-                                <td className="py-3 px-4 text-sm text-gray-600">{mov.timestamp}</td>
-                                <td className="py-3 px-4 font-semibold text-gray-900">{mov.product}</td>
-                                <td className="py-3 px-4 text-sm text-gray-700">{mov.type}</td>
-                                <td className="py-3 px-4 text-center text-gray-700">{mov.quantity}</td>
-                                <td className="py-3 px-4 text-sm text-gray-700">{mov.user}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-4">Historial de Movimientos de Inventario</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Fecha/Hora</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Producto</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Tipo</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-700">Cantidad</th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Usuario</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reportData.inventoryMovements.map((mov: any, index: number) => (
+                  <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="py-3 px-4 text-sm text-gray-600">{mov.timestamp}</td>
+                    <td className="py-3 px-4 font-semibold text-gray-900">{mov.product}</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{mov.type}</td>
+                    <td className="py-3 px-4 text-center text-gray-700">{mov.quantity}</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{mov.user}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

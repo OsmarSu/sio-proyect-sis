@@ -1,7 +1,6 @@
 // app/dashboard/page.tsx
 import StatCard from "@/components/dashboard/StatCard";
 import Button from "@/components/ui/Button";
-import Footer from '@/components/layout/Footer';
 // Importamos nuestros íconos
 import PackageIcon from "@/components/icons/PackageIcon";
 import ShoppingCartIcon from "@/components/icons/ShoppingCartIcon";
@@ -32,9 +31,9 @@ const DashboardPage = () => {
               </p>
             </div>
           </div>
-          
-          <Button 
-            variant="primary" 
+
+          <Button
+            variant="primary"
             icon={<PlusIcon className="h-4 w-4" />}
             className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg"
           >
@@ -103,9 +102,8 @@ const DashboardPage = () => {
         <div className="lg:col-span-1">
           <QuickAccessGrid />
         </div>
-        <Footer />
       </div>
-      
+
     </div>
   );
 };

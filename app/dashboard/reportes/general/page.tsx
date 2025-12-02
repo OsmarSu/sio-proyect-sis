@@ -1,7 +1,7 @@
 // app/dashboard/reportes/general/page.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, TrendingDown, DollarSign, Package, Users, ShoppingCart } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
@@ -9,14 +9,14 @@ import { useSearchParams } from 'next/navigation';
 // Función de traducción para los rangos de fecha
 const translateDateRange = (range: string) => {
     switch (range) {
-      case 'today': return 'Hoy';
-      case 'week': return 'Esta Semana';
-      case 'month': return 'Este Mes';
-      case 'year': return 'Este Año';
-      case 'custom': return 'Personalizado';
-      default: return range;
+        case 'today': return 'Hoy';
+        case 'week': return 'Esta Semana';
+        case 'month': return 'Este Mes';
+        case 'year': return 'Este Año';
+        case 'custom': return 'Personalizado';
+        default: return range;
     }
-  };
+};
 
 function GeneralReportPage() {
     const searchParams = useSearchParams();
