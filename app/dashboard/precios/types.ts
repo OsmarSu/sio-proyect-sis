@@ -2,8 +2,9 @@
 import { Product } from "../productos/types";
 
 export interface PricedProduct extends Product {
+  code: string;
   floorPrice: number; // Precio mínimo en Bs.
-  lastUpdate: string; 
+  lastUpdate: string;
 }
 
 export type PriceField = 'minorPrice' | 'majorPrice' | 'floorPrice';

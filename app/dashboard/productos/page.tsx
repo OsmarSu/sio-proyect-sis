@@ -2,6 +2,7 @@ import { getProducts } from '@/actions/get-products';
 import { getCategories } from '@/actions/get-categories';
 import { getBrands } from '@/actions/get-brands';
 import { ProductsGrid } from '@/components/products/products-grid';
+import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import PlusIcon from '@/components/icons/PlusIcon';
 
@@ -32,12 +33,19 @@ export default async function ProductosPage() {
               </p>
             </div>
           </div>
+          <div className="flex items-center gap-2">
+            <Link href="/dashboard/productos/nuevo">
+              <Button variant="gradient" icon={<PlusIcon />}>
+                Nuevo Producto
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
       {/* Products Grid */}
-      <ProductsGrid 
-        initialProducts={products} 
+      <ProductsGrid
+        initialProducts={products}
         categories={categories}
         brands={brands}
       />

@@ -9,12 +9,12 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export default function Header() {
   const pathname = usePathname();
-  const { user, logout, loading } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const isDarkPage = ['/login', '/register'].includes(pathname);
-  const canAccessDashboard = user?.role === 'PERSONAL';
+  const canAccessDashboard = user?.role !== 'CLIENTE';
 
   const navigation = [
     { name: 'Inicio', href: '/' },
@@ -44,7 +44,7 @@ export default function Header() {
   const navLinkClass = (isActive: boolean) => {
     let classes = 'text-sm transition-all duration-300 transform hover:-translate-y-0.5';
     if (isActive) {
-      classes += isDarkPage 
+      classes += isDarkPage
         ? ' font-semibold text-blue-400'
         : ' font-semibold text-blue-600';
     } else {
@@ -67,13 +67,13 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <Image 
+            <Image
               src="/LOGO OASIS.png" // <-- Tu cambio de logo
-              alt="Oasis Store Logo" 
+              alt="Oasis Store Logo"
               width={48}
               height={48}
               className="rounded-full object-cover transform group-hover:scale-110 transition-transform duration-300"
-              priority 
+              priority
             />
             <span className={`
               text-xl font-bold transition-colors duration-300
@@ -106,7 +106,7 @@ export default function Header() {
 
           {/* Right Side - Auth & Dashboard */}
           <div className="hidden md:flex items-center gap-4">
-            {loading ? (
+            {isLoading ? (
               <div className={isDarkPage ? 'text-gray-300' : 'text-gray-600'}>Cargando...</div>
             ) : user ? (
               <>
@@ -119,15 +119,14 @@ export default function Header() {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                     </svg>
-                    Panel de Gestión
+                    Ir al Panel Administrativo
                   </Link>
                 )}
                 <div className="relative">
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                      isDarkPage ? 'hover:bg-neutral-800' : 'hover:bg-gray-100'
-                    }`}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isDarkPage ? 'hover:bg-neutral-800' : 'hover:bg-gray-100'
+                      }`}
                   >
                     <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                       <span className="text-white font-semibold text-sm">
@@ -138,9 +137,8 @@ export default function Header() {
                       {user.name || user.email}
                     </span>
                     <svg
-                      className={`w-4 h-4 transition-transform ${isDarkPage ? 'text-gray-400' : 'text-gray-400'} ${
-                        userMenuOpen ? 'rotate-180' : ''
-                      }`}
+                      className={`w-4 h-4 transition-transform ${isDarkPage ? 'text-gray-400' : 'text-gray-400'} ${userMenuOpen ? 'rotate-180' : ''
+                        }`}
                       fill="none" stroke="currentColor" viewBox="0 0 24 24"
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -167,13 +165,12 @@ export default function Header() {
                         <Link href="/dashboard" className={navLinkClass(false) + ' block w-full text-left px-4 py-2'} onClick={() => setUserMenuOpen(false)}>Panel Administrativo</Link>
                       )}
                       <hr className={isDarkPage ? 'my-1 border-neutral-700' : 'my-1'} />
-                      <button 
+                      <button
                         onClick={() => { logout(); setUserMenuOpen(false); }}
-                        className={`block w-full text-left px-4 py-2 text-sm transition-colors ${
-                          isDarkPage 
-                            ? 'text-red-500 hover:bg-red-900/50' 
-                            : 'text-red-600 hover:bg-red-50'
-                        }`}
+                        className={`block w-full text-left px-4 py-2 text-sm transition-colors ${isDarkPage
+                          ? 'text-red-500 hover:bg-red-900/50'
+                          : 'text-red-600 hover:bg-red-50'
+                          }`}
                       >
                         Cerrar Sesión
                       </button>
@@ -185,8 +182,8 @@ export default function Header() {
               <>
                 {/* <-- MEJORA: Lógica para ocultar el botón si ya estamos en /login */}
                 {pathname !== '/login' && (
-                  <Link 
-                    href="/login" 
+                  <Link
+                    href="/login"
                     className={`
                       px-4 py-2 font-medium transition-all duration-300 transform rounded-lg whitespace-nowrap
                       hover:-translate-y-0.5
@@ -199,7 +196,7 @@ export default function Header() {
                     Iniciar Sesión
                   </Link>
                 )}
-                
+
                 {/* Comentado por que no sabemso si lo usaremos */}
                 {/* {pathname !== '/register' && (
                   <Link 
@@ -216,9 +213,8 @@ export default function Header() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className={`md:hidden p-2 transition-colors ${
-              isDarkPage ? 'text-gray-300 hover:text-blue-400' : 'text-gray-600 hover:text-blue-600'
-            }`}
+            className={`md:hidden p-2 transition-colors ${isDarkPage ? 'text-gray-300 hover:text-blue-400' : 'text-gray-600 hover:text-blue-600'
+              }`}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {mobileMenuOpen ? (
@@ -233,8 +229,8 @@ export default function Header() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className={`
-            md:hidden py-4 ${isDarkPage 
-              ? 'bg-neutral-950 border-t border-neutral-800' 
+            md:hidden py-4 ${isDarkPage
+              ? 'bg-neutral-950 border-t border-neutral-800'
               : 'border-t border-gray-200'
             }
           `}>
@@ -248,7 +244,7 @@ export default function Header() {
                 {item.name}
               </Link>
             ))}
-             <a
+            <a
               key="Contacto"
               href="#contacto"
               onClick={(e) => {
@@ -259,7 +255,7 @@ export default function Header() {
             >
               Contacto
             </a>
-            
+
             {user ? (
               // ... (código de usuario logueado en móvil no cambia) ...
               <div className={`mt-4 pt-4 ${isDarkPage ? 'border-t border-neutral-800' : 'border-t border-gray-200'}`}>
@@ -279,12 +275,12 @@ export default function Header() {
               </div>
             ) : (
               <div className={`mt-4 pt-4 space-y-2 ${isDarkPage ? 'border-t border-neutral-800' : 'border-t border-gray-200'}`}>
-                
+
                 {/* <-- MEJORA: Lógica para ocultar el botón si ya estamos en /login */}
                 {pathname !== '/login' && (
                   <Link href="/login" className={navLinkClass(false) + ' block text-center !py-2 px-3 rounded-md mx-2'} onClick={() => setMobileMenuOpen(false)}>Iniciar Sesión</Link>
                 )}
-                
+
                 {/* <-- MEJORA: Comentado para ser consistente con el escritorio */}
                 {/* {pathname !== '/register' && (
                   <Link href="/register" className="block mx-3 py-2 text-center bg-blue-600 text-white rounded-lg font-semibold" onClick={() => setMobileMenuOpen(false)}>Registrarse</Link>

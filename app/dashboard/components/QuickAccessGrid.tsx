@@ -7,7 +7,7 @@ import ShoppingCartIcon from "@/components/icons/ShoppingCartIcon";
 import UsersIcon from "@/components/icons/UsersIcon";
 import TruckIcon from "@/components/icons/TruckIcon";
 // Importamos el nuevo icono de Precios
-import PriceTagIcon from "@/components/icons/PriceTagIcon"; 
+import PriceTagIcon from "@/components/icons/PriceTagIcon";
 
 const QuickAccessCard = ({
   title,
@@ -58,15 +58,10 @@ const QuickAccessGrid = () => {
       <p className="text-sm text-gray-600 mb-6">
         Módulos principales del sistema
       </p>
-      
+
       {/* Ajuste de grid a 3 columnas en pantallas medianas para acomodar el 5to elemento */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <QuickAccessCard
-          title="Inventario"
-          icon={<PackageIcon className="h-8 w-8" />}
-          href="/dashboard/inventario"
-          color="blue"
-        />
+
         <QuickAccessCard
           title="Ventas"
           icon={<ShoppingCartIcon className="h-8 w-8" />}

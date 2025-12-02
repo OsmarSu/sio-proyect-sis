@@ -1,26 +1,20 @@
 // app/dashboard/precios/hooks/usePrices.ts
 import { useState, useMemo } from 'react';
-import { mockProducts } from '@/lib/data/mockProducts'; // Tu data base
+
 import { PricedProduct, MassUpdateConfig, PriceField } from '../types';
 import { Product } from '../../productos/types';
 
-export const usePrices = () => {
-  // Inicializamos data mockeada con floorPrice
-  const [products, setProducts] = useState<PricedProduct[]>(() => 
-    (mockProducts as unknown as Product[]).map(p => ({
-      ...p,
-      floorPrice: Math.floor(p.majorPrice * 0.9), // Ejemplo: Floor es 90% del mayorista
-      lastUpdate: new Date().toLocaleDateString()
-    }))
-  );
+export const usePrices = (initialProducts: PricedProduct[]) => {
+  // Inicializamos con los datos reales pasados desde el servidor
+  const [products, setProducts] = useState<PricedProduct[]>(initialProducts);
 
   // Estados de Filtros para la pestaña "Lista"
   const [filters, setFilters] = useState({ search: '', category: '' });
 
   // 1. Update Individual
   const updateSinglePrice = (id: string, newPrices: { minorPrice: number, majorPrice: number, floorPrice: number }) => {
-    setProducts(prev => prev.map(p => 
-      p.id === id ? { ...p, ...newPrices, lastUpdate: new Date().toLocaleDateString() } : p
+    setProducts(prev => prev.map(p =>
+      p.id === Number(id) ? { ...p, ...newPrices, lastUpdate: new Date().toLocaleDateString() } : p
     ));
   };
 
@@ -52,8 +46,8 @@ export const usePrices = () => {
   // Productos filtrados para la lista
   const filteredProducts = useMemo(() => {
     return products.filter(p => {
-      const matchSearch = p.name.toLowerCase().includes(filters.search.toLowerCase()) || 
-                          p.code.toLowerCase().includes(filters.search.toLowerCase());
+      const matchSearch = p.name.toLowerCase().includes(filters.search.toLowerCase()) ||
+        p.code.toLowerCase().includes(filters.search.toLowerCase());
       const matchCat = filters.category === '' || filters.category === 'Todas' || p.category === filters.category;
       return matchSearch && matchCat;
     });

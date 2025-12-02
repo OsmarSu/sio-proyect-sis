@@ -36,7 +36,7 @@ function InventarioReportPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const res = await fetch(`/ api / reports / inventario ? range = ${dateRange} `);
+        const res = await fetch(`/api/reports/inventario?range=${dateRange}`);
         if (!res.ok) {
           const errorData = await res.json();
           throw new Error(errorData.error || 'Error al cargar los datos del reporte de inventario.');

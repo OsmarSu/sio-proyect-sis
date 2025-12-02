@@ -3,14 +3,14 @@ import React from 'react';
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   icon?: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'destructive' | 'outline' | 'ghost' | 'default';
+  variant?: 'primary' | 'secondary' | 'destructive' | 'outline' | 'ghost' | 'default' | 'gradient';
   size?: 'default' | 'sm' | 'lg' | 'icon';
   className?: string;
 }
 
 const Button = ({ children, icon, variant = 'primary', size = 'default', className = '', ...props }: ButtonProps) => {
   const baseStyles = "flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
-  
+
   const variantStyles = {
     primary: "bg-white text-black hover:bg-gray-200",
     default: "bg-primary text-primary-foreground hover:bg-primary/90",
@@ -18,6 +18,7 @@ const Button = ({ children, icon, variant = 'primary', size = 'default', classNa
     destructive: "bg-red-500 text-white hover:bg-red-600",
     outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
     ghost: "hover:bg-accent hover:text-accent-foreground",
+    gradient: "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg hover:shadow-blue-500/50 transform hover:scale-105",
   };
 
   const sizeStyles = {
@@ -32,7 +33,7 @@ const Button = ({ children, icon, variant = 'primary', size = 'default', classNa
   const selectedSize = sizeStyles[size] || sizeStyles.default;
 
   return (
-    <button 
+    <button
       className={`${baseStyles} ${selectedVariant} ${selectedSize} ${className}`}
       {...props}
     >

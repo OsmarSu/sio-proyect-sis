@@ -115,15 +115,7 @@ const Sidebar = () => {
       ),
       href: '/dashboard/compras',
     },
-    {
-      title: 'Inventario',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-        </svg>
-      ),
-      href: '/dashboard/inventario',
-    },
+
     {
       title: 'Ventas',
       icon: (
@@ -214,10 +206,10 @@ const Sidebar = () => {
                 }`}
             >
               <Link
-                href={item.children ? '#' : item.href}
+                href={item.children ? '#' : (item.href || '#')}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${isActive(item.href)
-                    ? `bg-[${COLOR_PRIMARY}]/10 text-[${COLOR_PRIMARY}] shadow-sm`
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ? `bg-[${COLOR_PRIMARY}]/10 text-[${COLOR_PRIMARY}] shadow-sm`
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 onClick={item.children ? (e) => {
                   e.preventDefault();
