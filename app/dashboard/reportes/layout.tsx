@@ -11,6 +11,19 @@ const COLOR_PRIMARY = '#5556EE';
 const COLOR_SECONDARY = '#8150CE';
 const COLOR_SUCCESS = '#74AB41';
 
+// Función de traducción para los rangos de fecha (puedes moverla a un utils.ts si lo prefieres)
+const translateDateRange = (range: string) => {
+    switch (range) {
+      case 'today': return 'Hoy';
+      case 'week': return 'Esta Semana';
+      case 'month': return 'Este Mes';
+      case 'year': return 'Este Año';
+      case 'custom': return 'Personalizado';
+      default: return range;
+    }
+  };
+
+
 function ReportsLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -18,7 +31,7 @@ function ReportsLayoutContent({ children }: { children: React.ReactNode }) {
 
   const [dateRange, setDateRange] = useState(searchParams.get('range') || 'month');
   const [exportFormat, setExportFormat] = useState<'PDF' | 'Excel' | null>(null);
-  const [isExporting, setIsExporting] = useState(false); // Nuevo estado para el loading de exportación
+  const [isExporting, setIsExporting] = useState(false);
 
   const reportTabs = [
     { name: 'General', href: '/dashboard/reportes/general' },
@@ -61,8 +74,7 @@ function ReportsLayoutContent({ children }: { children: React.ReactNode }) {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        // ===> CAMBIO CRUCIAL AQUÍ PARA LA EXTENSIÓN DE EXCEL <===
-        a.download = `${reportTypeSegment}-reporte-${dateRange}.${format === 'Excel' ? 'xlsx' : format.toLowerCase()}`;
+        a.download = `${reportTypeSegment}-reporte-${translateDateRange(dateRange).toLowerCase().replace(/\s/g, '-')}.${format === 'Excel' ? 'xlsx' : format.toLowerCase()}`;
         document.body.appendChild(a);
         a.click();
         a.remove();
