@@ -1,46 +1,80 @@
 // app/dashboard/reportes/inventario/page.tsx
 'use client';
 
-import React, { Suspense } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Package, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
-// Colores de tu paleta (referencia)
-const PRIMARY_COLOR = '#5556EE';
-const DANGER_COLOR = '#DE6415';
-const ACCENT_COLOR = '#2EB4D1';
-export const dynamic = 'force-dynamic';
+// Función de traducción para los rangos de fecha
+const translateDateRange = (range: string) => {
+    switch (range) {
+      case 'today': return 'Hoy';
+      case 'week': return 'Esta Semana';
+      case 'month': return 'Este Mes';
+      case 'year': return 'Este Año';
+      case 'custom': return 'Personalizado';
+      default: return range;
+    }
+  };
 
-function InventarioReportContent() {
+function InventarioReportPage() {
   const searchParams = useSearchParams();
   const dateRange = searchParams.get('range') || 'month';
 
-  // Datos dummy de inventario
-  const stockPorCategoria = [
-    { categoria: 'Construcción', totalStock: 800, valorTotal: 120000 },
-    { categoria: 'Muñecas', totalStock: 450, valorTotal: 75000 },
-    { categoria: 'Deportes', totalStock: 600, valorTotal: 50000 },
-    { categoria: 'Juegos de Mesa', totalStock: 300, valorTotal: 40000 },
-    { categoria: 'Electrónicos', totalStock: 200, valorTotal: 90000 },
-  ];
+  // Colores de tu paleta (referencia)
+  const PRIMARY_COLOR = '#5556EE';
+  const DANGER_COLOR = '#DE6415';
+  const ACCENT_COLOR = '#2EB4D1';
 
-  const productosBajoStock = [
-    { nombre: 'Set de Bloques Pequeños', stock: 5, minStock: 10 },
-    { nombre: 'Muñeca Articulada', stock: 3, minStock: 8 },
-    { nombre: 'Balón de Fútbol N°5', stock: 7, minStock: 12 },
-  ];
+  const [reportData, setReportData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchReportData = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const res = await fetch(`/api/reports/inventario?range=${dateRange}`);
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error || 'Error al cargar los datos del reporte de inventario.');
+            }
+            const data = await res.json();
+            setReportData(data);
+        } catch (err: any) {
+            setError(err.message);
+            console.error('Error fetching inventario report data:', err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    fetchReportData();
+  }, [dateRange]);
+
+  if (isLoading) {
+    return <div className="text-center p-8">Cargando reporte de inventario...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center p-8 text-red-600">Error: {error}</div>;
+  }
+
+  if (!reportData || (!reportData.stockPorCategoria?.length && !reportData.productosBajoStock?.length && !reportData.inventoryMovements?.length)) {
+      return <div className="text-center p-8 text-gray-600">No hay datos disponibles para el reporte de inventario.</div>;
+  }
 
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-8">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">Stock por Categoría ({dateRange})</h3>
+        <h3 className="text-xl font-bold text-gray-900 mb-4">Stock por Categoría (Período: {translateDateRange(dateRange)})</h3>
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={stockPorCategoria}>
+          <BarChart data={reportData.stockPorCategoria}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="categoria" />
             <YAxis />
-            <Tooltip />
+            <Tooltip formatter={(value: number, name: string, props: any) => [`${value} uds.`, name]} />
             <Legend />
             <Bar dataKey="totalStock" fill={ACCENT_COLOR} name="Unidades en Stock" />
             <Bar dataKey="valorTotal" fill={PRIMARY_COLOR} name="Valor Total (Bs.)" />
@@ -48,47 +82,73 @@ function InventarioReportContent() {
         </ResponsiveContainer>
       </div>
 
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-        <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <AlertCircle className="w-6 h-6 text-oasis-danger" />
-          Productos con Stock Crítico
-        </h3>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">Producto</th>
-                <th className="text-center py-3 px-4 font-semibold text-gray-700">Stock Actual</th>
-                <th className="text-center py-3 px-4 font-semibold text-gray-700">Stock Mínimo</th>
-                <th className="text-center py-3 px-4 font-semibold text-gray-700">Acción</th>
-              </tr>
-            </thead>
-            <tbody>
-              {productosBajoStock.map((item, index) => (
-                <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="py-3 px-4 font-semibold text-gray-900">{item.nombre}</td>
-                  <td className="py-3 px-4 text-center text-oasis-danger font-semibold">{item.stock}</td>
-                  <td className="py-3 px-4 text-center text-gray-700">{item.minStock}</td>
-                  <td className="py-3 px-4 text-center">
-                    <span className="bg-oasis-danger-light text-oasis-danger px-3 py-1 rounded-full text-sm font-semibold">
-                      Reabastecer
-                    </span>
-                  </td>
+      {reportData.productosBajoStock?.length > 0 && (
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <AlertCircle className="w-6 h-6 text-oasis-danger" />
+            Productos con Stock Crítico
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Producto</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-700">Stock Actual</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-700">Stock Mínimo</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-700">Ubicación</th>
+                  <th className="text-center py-3 px-4 font-semibold text-gray-700">Acción</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {reportData.productosBajoStock.map((item: any, index: number) => (
+                  <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="py-3 px-4 font-semibold text-gray-900">{item.nombre}</td>
+                    <td className="py-3 px-4 text-center text-oasis-danger font-semibold">{item.stock}</td>
+                    <td className="py-3 px-4 text-center text-gray-700">{item.minStock}</td>
+                    <td className="py-3 px-4 text-center text-gray-700">{item.ubicacion || 'N/A'}</td>
+                    <td className="py-3 px-4 text-center">
+                      <span className="bg-oasis-danger-light text-oasis-danger px-3 py-1 rounded-full text-sm font-semibold">
+                        Reabastecer
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-    </div>
-  );
-}
+      )}
 
-function InventarioReportPage() {
-  return (
-    <Suspense fallback={<div>Cargando reporte de inventario...</div>}>
-      <InventarioReportContent />
-    </Suspense>
+      {reportData.inventoryMovements?.length > 0 && (
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mt-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Historial de Movimientos de Inventario</h3>
+            <div className="overflow-x-auto">
+                <table className="w-full">
+                    <thead>
+                        <tr className="border-b border-gray-200">
+                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Fecha/Hora</th>
+                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Producto</th>
+                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Tipo</th>
+                            <th className="text-center py-3 px-4 font-semibold text-gray-700">Cantidad</th>
+                            <th className="text-left py-3 px-4 font-semibold text-gray-700">Usuario</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {reportData.inventoryMovements.map((mov: any, index: number) => (
+                            <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
+                                <td className="py-3 px-4 text-sm text-gray-600">{mov.timestamp}</td>
+                                <td className="py-3 px-4 font-semibold text-gray-900">{mov.product}</td>
+                                <td className="py-3 px-4 text-sm text-gray-700">{mov.type}</td>
+                                <td className="py-3 px-4 text-center text-gray-700">{mov.quantity}</td>
+                                <td className="py-3 px-4 text-sm text-gray-700">{mov.user}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+      )}
+    </div>
   );
 }
 

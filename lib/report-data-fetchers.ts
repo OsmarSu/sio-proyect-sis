@@ -1,23 +1,62 @@
 // lib/report-data-fetchers.ts
-// import prisma from '@/lib/prisma'; // Asegúrate de que esta ruta a tu instancia de Prisma sea correcta
-// Si aún no tienes una instancia de prisma, puedes usar datos dummy
-const prisma = {
-  // Simulación de Prisma para datos dummy
-  // Aquí irían tus modelos y métodos reales si estuvieras conectado a la DB
-};
-
 
 interface ReportDataParams {
   range: string;
-  // Añade otros filtros si los implementas
 }
 
-// Función auxiliar para simular el filtrado por rango de fechas
-const getSimulatedDataByRange = (data: any[], range: string) => {
-  // Aquí podrías implementar lógica para filtrar los datos dummy
-  // basándote en el `range`. Por simplicidad, por ahora devuelve los datos completos.
+const translateMonth = (monthCode: string) => {
+    switch (monthCode) {
+        case 'Ene': return 'Enero';
+        case 'Feb': return 'Febrero';
+        case 'Mar': return 'Marzo';
+        case 'Abr': return 'Abril';
+        case 'May': return 'Mayo';
+        case 'Jun': return 'Junio';
+        case 'Jul': return 'Julio';
+        case 'Ago': return 'Agosto';
+        case 'Sep': return 'Septiembre';
+        case 'Oct': return 'Octubre';
+        case 'Nov': return 'Noviembre';
+        case 'Dic': return 'Diciembre';
+        default: return monthCode;
+    }
+};
+
+const translateDay = (dayCode: string) => {
+    switch (dayCode) {
+        case '01': return '01'; // Días numéricos no necesitan traducción
+        // ... otros días si tienes nombres de días (ej. 'Lun', 'Mar')
+        default: return dayCode;
+    }
+};
+
+// Función auxiliar para simular el filtrado por rango de fechas (mejorada para dar más variación)
+const getSimulatedDataByRange = (baseData: any[], range: string) => {
+  // En un escenario real, aquí se harían las consultas SQL/Prisma filtradas por rango de fechas
+  // Esta es una simulación básica
+  let data = [...baseData]; // Copia de los datos base
+
+  if (range === 'today') {
+    data = data.slice(0, 1).map(d => ({ ...d, ventas: d.ventas / 30, total: d.total / 30, cantidad: d.cantidad / 5 }));
+  } else if (range === 'week') {
+    data = [
+      { dia: 'Lun', total: 5000, items: 25 },
+      { dia: 'Mar', total: 6000, items: 30 },
+      { dia: 'Mié', total: 7000, items: 35 },
+      { dia: 'Jue', total: 6500, items: 32 },
+      { dia: 'Vie', total: 8000, items: 40 },
+      { dia: 'Sáb', total: 9000, items: 45 },
+      { dia: 'Dom', total: 5500, items: 28 },
+    ];
+  } else if (range === 'month') {
+    // Si los datos base ya tienen meses, tradúcelos aquí
+    data = data.map(d => ({ ...d, mes: d.mes ? translateMonth(d.mes) : d.mes }));
+  } else if (range === 'year') {
+    data = data.map(d => ({ ...d, ventas: d.ventas * 12, total: d.total * 12, cantidad: d.cantidad * 6 }));
+  }
   return data;
 };
+
 
 // ====================================================================================================
 // FUNCIONES PARA OBTENER DATOS DE REPORTES (Aquí iría la lógica real con Prisma)
@@ -26,7 +65,6 @@ const getSimulatedDataByRange = (data: any[], range: string) => {
 export async function getGeneralReportData(params: ReportDataParams) {
   console.log(`[Backend] Fetching general report data for range: ${params.range}`);
 
-  // Datos simulados (reemplazar con consultas a la DB con Prisma)
   const ventasMensualesBase = [
     { mes: 'Ene', ventas: 45678, productos: 234 },
     { mes: 'Feb', ventas: 52341, productos: 267 },
@@ -44,19 +82,26 @@ export async function getGeneralReportData(params: ReportDataParams) {
     { categoria: 'Otros', valor: 5, monto: 9634 }
   ];
 
-  // Simula el filtrado por rango
   const ventasMensuales = getSimulatedDataByRange(ventasMensualesBase, params.range);
   const ventasPorCategoria = getSimulatedDataByRange(ventasPorCategoriaBase, params.range);
 
+  const generalActivityLog = [
+    { timestamp: "2024-01-01 10:00", action: "Producto 'Lego City' añadido", user: "Admin Test" },
+    { timestamp: "2024-01-02 11:30", action: "Venta 'V001' registrada", user: "Empleado 1" },
+    { timestamp: "2024-01-03 14:00", action: "Stock 'Barbie' actualizado (+50)", user: "Admin Test" },
+  ];
+
+
   return {
     metrics: [
-      { titulo: 'Ventas Totales', valor: 'Bs. 192,777', cambio: '+23%', trend: 'up' },
-      { titulo: 'Productos Vendidos', valor: '1,697', cambio: '+12%', trend: 'up' },
+      { titulo: 'Ventas Totales', valor: 'Bs. ' + (ventasMensuales.reduce((sum, item) => sum + item.ventas, 0)).toLocaleString('es-BO'), cambio: '+23%', trend: 'up' },
+      { titulo: 'Productos Vendidos', valor: (ventasMensuales.reduce((sum, item) => sum + item.productos, 0)).toLocaleString('es-BO'), cambio: '+12%', trend: 'up' },
       { titulo: 'Clientes Nuevos', valor: '34', cambio: '+5%', trend: 'up' },
       { titulo: 'Ticket Promedio', valor: 'Bs. 513', cambio: '-3%', trend: 'down' }
     ],
     ventasMensuales,
     ventasPorCategoria,
+    activityLog: generalActivityLog,
   };
 }
 
@@ -71,10 +116,23 @@ export async function getProductosReportData(params: ReportDataParams) {
     { nombre: 'Pelota de Fútbol', cantidad: 203, ingresos: 10150 }
   ];
 
-  const productosMasVendidos = getSimulatedDataByRange(productosMasVendidosBase, params.range);
+  const stockActualBase = [
+    { nombre: 'Lego City Policía', stockActual: 20, minStock: 10, ubicacion: 'Estante A' },
+    { nombre: 'Muñeca Barbie', stockActual: 30, minStock: 15, ubicacion: 'Depósito 1' },
+    { nombre: 'Carro RC 4x4', stockActual: 5, minStock: 8, ubicacion: 'Estante B' },
+    { nombre: 'Monopoly Clásico', stockActual: 12, minStock: 5, ubicacion: 'Estante C' },
+  ];
+
+  const productActivityLog = [
+    { timestamp: "2024-01-01 10:00", action: "Producto 'Lego City' añadido", user: "Admin Test", productId: "P001" },
+    { timestamp: "2024-01-05 11:30", action: "Stock 'Carro RC 4x4' reducido en 3", user: "Empleado 1", productId: "P003" },
+    { timestamp: "2024-01-10 14:00", action: "Descripción 'Barbie' actualizada", user: "Admin Test", productId: "P002" },
+  ];
 
   return {
-    productosMasVendidos,
+    productosMasVendidos: getSimulatedDataByRange(productosMasVendidosBase, params.range),
+    stockActual: getSimulatedDataByRange(stockActualBase, params.range),
+    activityLog: productActivityLog,
   };
 }
 
@@ -95,9 +153,16 @@ export async function getVentasReportData(params: ReportDataParams) {
     { vendedor: 'Marta R.', ventas: 11000, comision: 1100 },
     { vendedor: 'Carlos S.', ventas: 8000, comision: 800 },
   ];
+  const salesHistory = [
+    { id: "V001", customer: "Juan Pérez", total: 250, date: "2024-01-01", status: "Completada" },
+    { id: "V002", customer: "Ana García", total: 180, date: "2024-01-02", status: "Completada" },
+    { id: "V003", customer: "María López", total: 500, date: "2024-01-03", status: "Pendiente" },
+  ];
+
   return {
     ventasDiarias: getSimulatedDataByRange(ventasDiariasBase, params.range),
     ventasPorVendedor: getSimulatedDataByRange(ventasPorVendedorBase, params.range),
+    salesHistory: salesHistory,
   };
 }
 
@@ -111,23 +176,32 @@ export async function getInventarioReportData(params: ReportDataParams) {
     { categoria: 'Electrónicos', totalStock: 200, valorTotal: 90000 },
   ];
   const productosBajoStockBase = [
-    { nombre: 'Set de Bloques Pequeños', stock: 5, minStock: 10 },
-    { nombre: 'Muñeca Articulada', stock: 3, minStock: 8 },
-    { nombre: 'Balón de Fútbol N°5', stock: 7, minStock: 12 },
+    { nombre: 'Set de Bloques Pequeños', stock: 5, minStock: 10, ubicacion: 'Depósito' },
+    { nombre: 'Muñeca Articulada', stock: 3, minStock: 8, ubicacion: 'Estante' },
+    { nombre: 'Balón de Fútbol N°5', stock: 7, minStock: 12, ubicacion: 'Entrada' },
+    { nombre: 'Carro RC 4x4', stock: 2, minStock: 5, ubicacion: 'Estante' },
   ];
+  const inventoryMovements = [
+    { timestamp: "2024-01-01 09:00", product: "Lego City Policía", type: "Entrada", quantity: 100, user: "Admin Test" },
+    { timestamp: "2024-01-05 15:00", product: "Muñeca Barbie", type: "Salida por Venta", quantity: 5, user: "Empleado 1" },
+    { timestamp: "2024-01-10 11:00", product: "Carro RC 4x4", type: "Ajuste de Stock", quantity: -2, user: "Admin Test" },
+  ];
+
   return {
     stockPorCategoria: getSimulatedDataByRange(stockPorCategoriaBase, params.range),
     productosBajoStock: getSimulatedDataByRange(productosBajoStockBase, params.range),
+    inventoryMovements: inventoryMovements,
   };
 }
 
 export async function getClientesReportData(params: ReportDataParams) {
   console.log(`[Backend] Fetching clients report data for range: ${params.range}`);
   const clientesPorTipoBase = [
-    { tipo: 'Activos', count: 120, valor: 60 },
-    { tipo: 'Nuevos', count: 30, valor: 15 },
-    { tipo: 'Inactivos', count: 40, valor: 20 },
-    { tipo: 'VIP', count: 10, valor: 5 },
+    { tipo: 'Activos', count: 120, valor: 48 },
+    { tipo: 'Nuevos', count: 30, valor: 12 },
+    { tipo: 'Inactivos', count: 40, valor: 16 },
+    { tipo: 'Mayoristas', count: 50, valor: 20 },
+    { tipo: 'Minoristas', count: 10, valor: 4 },
   ];
   const clientesTopComprasBase = [
     { cliente: 'Juan Pérez', compras: 5, totalGastado: 1500 },
@@ -135,8 +209,15 @@ export async function getClientesReportData(params: ReportDataParams) {
     { cliente: 'Pedro L.', compras: 7, totalGastado: 2100 },
     { cliente: 'Ana C.', compras: 4, totalGastado: 900 },
   ];
+  const clientActivityLog = [
+    { timestamp: "2024-01-01 10:00", clientName: "Juan Pérez", action: "Cliente registrado", user: "Admin Test" },
+    { timestamp: "2024-01-15 11:30", clientName: "Ana García", action: "Datos actualizados", user: "Admin Test" },
+    { timestamp: "2024-02-01 14:00", clientName: "María López", action: "Estado inactivo", user: "Admin Test" },
+  ];
+
   return {
     clientesPorTipo: getSimulatedDataByRange(clientesPorTipoBase, params.range),
     clientesTopCompras: getSimulatedDataByRange(clientesTopComprasBase, params.range),
+    clientActivityLog: clientActivityLog,
   };
 }
