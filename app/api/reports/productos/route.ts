@@ -4,10 +4,13 @@ import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth,
 
 export const dynamic = 'force-dynamic';
 
+import { generatePDF, generateExcel } from '@/lib/report-generator';
+
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
         const range = searchParams.get('range') || 'month';
+        const formatType = searchParams.get('format');
 
         let startDate = new Date();
         let endDate = new Date();
@@ -89,11 +92,37 @@ export async function GET(request: Request) {
         // 3. Bitácora (Placeholder)
         const activityLog: any[] = [];
 
-        return NextResponse.json({
+        const reportData = {
             productosMasVendidos,
             stockActual,
-            activityLog
-        });
+            activityLog,
+            // Tabla genérica para el reporte
+            tableData: stockActual.map(p => ({
+                Producto: p.nombre,
+                Stock: p.stockActual,
+                Estado: p.estado
+            }))
+        };
+
+        if (formatType === 'pdf') {
+            const pdfBuffer = await generatePDF(reportData, 'Reporte de Productos');
+            return new NextResponse(pdfBuffer as any, {
+                headers: {
+                    'Content-Type': 'application/pdf',
+                    'Content-Disposition': 'attachment; filename=reporte_productos.pdf'
+                }
+            });
+        } else if (formatType === 'excel') {
+            const excelBuffer = await generateExcel(reportData, 'Reporte de Productos');
+            return new NextResponse(excelBuffer as any, {
+                headers: {
+                    'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    'Content-Disposition': 'attachment; filename=reporte_productos.xlsx'
+                }
+            });
+        }
+
+        return NextResponse.json(reportData);
 
     } catch (error) {
         console.error('Error fetching products report:', error);

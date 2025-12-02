@@ -65,8 +65,44 @@ function InventarioReportPage() {
     return <div className="text-center p-8 text-gray-600">No hay datos disponibles para el reporte de inventario.</div>;
   }
 
+  const handleDownload = async (format: 'pdf' | 'excel') => {
+    try {
+      const res = await fetch(`/api/reports/inventario?range=${dateRange}&format=${format}`);
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `reporte_inventario.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      } else {
+        alert("Error al descargar el reporte");
+      }
+    } catch (error) {
+      console.error("Error descarga:", error);
+      alert("Error al descargar");
+    }
+  };
+
   return (
     <div className="space-y-6">
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={() => handleDownload('pdf')}
+          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-sm font-medium"
+        >
+          Descargar PDF
+        </button>
+        <button
+          onClick={() => handleDownload('excel')}
+          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-sm font-medium"
+        >
+          Descargar Excel
+        </button>
+      </div>
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-8">
         <h3 className="text-xl font-bold text-gray-900 mb-4">Stock por Categoría (Período: {translateDateRange(dateRange)})</h3>
         <ResponsiveContainer width="100%" height={300}>

@@ -5,8 +5,13 @@ import { es } from 'date-fns/locale';
 
 export const dynamic = 'force-dynamic';
 
+import { generatePDF, generateExcel } from '@/lib/report-generator';
+
 export async function GET(request: Request) {
     try {
+        const { searchParams } = new URL(request.url);
+        const formatType = searchParams.get('format');
+
         // 1. Stock por Categoría
         // Necesitamos iterar productos y sumar stock * precio
         const productos = await prisma.producto.findMany({
@@ -69,11 +74,37 @@ export async function GET(request: Request) {
             user: 'Sistema'
         }));
 
-        return NextResponse.json({
+        const reportData = {
             stockPorCategoria,
             productosBajoStock,
-            inventoryMovements
-        });
+            inventoryMovements,
+            // Tabla genérica para el reporte
+            tableData: stockPorCategoria.map(c => ({
+                Categoría: c.categoria,
+                Stock: c.totalStock,
+                Valor: `Bs. ${c.valorTotal.toLocaleString()}`
+            }))
+        };
+
+        if (formatType === 'pdf') {
+            const pdfBuffer = await generatePDF(reportData, 'Reporte de Inventario');
+            return new NextResponse(pdfBuffer as any, {
+                headers: {
+                    'Content-Type': 'application/pdf',
+                    'Content-Disposition': 'attachment; filename=reporte_inventario.pdf'
+                }
+            });
+        } else if (formatType === 'excel') {
+            const excelBuffer = await generateExcel(reportData, 'Reporte de Inventario');
+            return new NextResponse(excelBuffer as any, {
+                headers: {
+                    'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    'Content-Disposition': 'attachment; filename=reporte_inventario.xlsx'
+                }
+            });
+        }
+
+        return NextResponse.json(reportData);
 
     } catch (error) {
         console.error('Error fetching inventory report:', error);

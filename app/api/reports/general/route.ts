@@ -103,7 +103,7 @@ export async function GET(request: Request) {
         // MANEJO DE DESCARGAS
         if (formatType === 'pdf') {
             const pdfBuffer = await generatePDF(reportData, 'Reporte General');
-            return new NextResponse(pdfBuffer, {
+            return new NextResponse(pdfBuffer as any, {
                 headers: {
                     'Content-Type': 'application/pdf',
                     'Content-Disposition': 'attachment; filename=reporte_general.pdf'
@@ -111,7 +111,7 @@ export async function GET(request: Request) {
             });
         } else if (formatType === 'excel') {
             const excelBuffer = await generateExcel(reportData, 'Reporte General');
-            return new NextResponse(excelBuffer, {
+            return new NextResponse(excelBuffer as any, {
                 headers: {
                     'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                     'Content-Disposition': 'attachment; filename=reporte_general.xlsx'

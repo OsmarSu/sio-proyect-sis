@@ -8,15 +8,15 @@ import { Users, Star } from 'lucide-react';
 
 // Función de traducción para los rangos de fecha
 const translateDateRange = (range: string) => {
-    switch (range) {
-      case 'today': return 'Hoy';
-      case 'week': return 'Esta Semana';
-      case 'month': return 'Este Mes';
-      case 'year': return 'Este Año';
-      case 'custom': return 'Personalizado';
-      default: return range;
-    }
-  };
+  switch (range) {
+    case 'today': return 'Hoy';
+    case 'week': return 'Esta Semana';
+    case 'month': return 'Este Mes';
+    case 'year': return 'Este Año';
+    case 'custom': return 'Personalizado';
+    default: return range;
+  }
+};
 
 // Colores de tu paleta (referencia)
 const PRIMARY_COLOR = '#5556EE';
@@ -37,22 +37,22 @@ function ClientesReportPage() {
 
   useEffect(() => {
     const fetchReportData = async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-            const res = await fetch(`/api/reports/clientes?range=${dateRange}`);
-            if (!res.ok) {
-                const errorData = await res.json();
-                throw new Error(errorData.error || 'Error al cargar los datos del reporte de clientes.');
-            }
-            const data = await res.json();
-            setReportData(data);
-        } catch (err: any) {
-            setError(err.message);
-            console.error('Error fetching clientes report data:', err);
-        } finally {
-            setIsLoading(false);
+      setIsLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`/api/reports/clientes?range=${dateRange}`);
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || 'Error al cargar los datos del reporte de clientes.');
         }
+        const data = await res.json();
+        setReportData(data);
+      } catch (err: any) {
+        setError(err.message);
+        console.error('Error fetching clientes report data:', err);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchReportData();
   }, [dateRange]);
@@ -66,11 +66,47 @@ function ClientesReportPage() {
   }
 
   if (!reportData || (!reportData.clientesPorTipo?.length && !reportData.clientesTopCompras?.length && !reportData.clientActivityLog?.length)) {
-      return <div className="text-center p-8 text-gray-600">No hay datos disponibles para el reporte de clientes.</div>;
+    return <div className="text-center p-8 text-gray-600">No hay datos disponibles para el reporte de clientes.</div>;
   }
+
+  const handleDownload = async (format: 'pdf' | 'excel') => {
+    try {
+      const res = await fetch(`/api/reports/clientes?range=${dateRange}&format=${format}`);
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `reporte_clientes.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      } else {
+        alert("Error al descargar el reporte");
+      }
+    } catch (error) {
+      console.error("Error descarga:", error);
+      alert("Error al descargar");
+    }
+  };
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={() => handleDownload('pdf')}
+          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-sm font-medium"
+        >
+          Descargar PDF
+        </button>
+        <button
+          onClick={() => handleDownload('excel')}
+          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-sm font-medium"
+        >
+          Descargar Excel
+        </button>
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {reportData.clientesPorTipo?.length > 0 && (
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
@@ -82,7 +118,7 @@ function ClientesReportPage() {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  
+
                   outerRadius={100}
                   dataKey="valor"
                 >
@@ -104,7 +140,7 @@ function ClientesReportPage() {
               <BarChart data={reportData.clientesTopCompras}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="cliente" />
-                
+
                 <Tooltip formatter={(value: number, name: string) => [`Bs. ${value.toLocaleString('es-BO')}`, name]} />
                 <Legend />
                 <Bar dataKey="totalGastado" fill={PRIMARY_COLOR} name="Total Gastado (Bs.)" />

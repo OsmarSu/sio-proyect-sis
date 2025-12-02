@@ -65,8 +65,44 @@ function ProductosReportPage() {
     return <div className="text-center p-8 text-gray-600">No hay datos disponibles para el reporte de productos.</div>;
   }
 
+  const handleDownload = async (format: 'pdf' | 'excel') => {
+    try {
+      const res = await fetch(`/api/reports/productos?range=${dateRange}&format=${format}`);
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `reporte_productos.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      } else {
+        alert("Error al descargar el reporte");
+      }
+    } catch (error) {
+      console.error("Error descarga:", error);
+      alert("Error al descargar");
+    }
+  };
+
   return (
     <div>
+      <div className="flex justify-end gap-2 mb-6">
+        <button
+          onClick={() => handleDownload('pdf')}
+          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-sm font-medium"
+        >
+          Descargar PDF
+        </button>
+        <button
+          onClick={() => handleDownload('excel')}
+          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-sm font-medium"
+        >
+          Descargar Excel
+        </button>
+      </div>
       {/* Productos Más Vendidos */}
       {reportData.productosMasVendidos?.length > 0 && (
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-8">

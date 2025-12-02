@@ -4,10 +4,13 @@ import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth,
 
 export const dynamic = 'force-dynamic';
 
+import { generatePDF, generateExcel } from '@/lib/report-generator';
+
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
         const range = searchParams.get('range') || 'month';
+        const formatType = searchParams.get('format');
 
         let startDate = new Date();
         let endDate = new Date();
@@ -105,11 +108,36 @@ export async function GET(request: Request) {
         // Por ahora vacío o datos dummy si no hay bitácora real poblada
         const clientActivityLog: any[] = [];
 
-        return NextResponse.json({
+        const reportData = {
             clientesPorTipo,
             clientesTopCompras,
-            clientActivityLog
-        });
+            clientActivityLog,
+            // Tabla genérica para el reporte
+            tableData: clientesTopCompras.map(c => ({
+                Cliente: c.cliente,
+                'Total Gastado': `Bs. ${c.totalGastado.toLocaleString()}`
+            }))
+        };
+
+        if (formatType === 'pdf') {
+            const pdfBuffer = await generatePDF(reportData, 'Reporte de Clientes');
+            return new NextResponse(pdfBuffer as any, {
+                headers: {
+                    'Content-Type': 'application/pdf',
+                    'Content-Disposition': 'attachment; filename=reporte_clientes.pdf'
+                }
+            });
+        } else if (formatType === 'excel') {
+            const excelBuffer = await generateExcel(reportData, 'Reporte de Clientes');
+            return new NextResponse(excelBuffer as any, {
+                headers: {
+                    'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    'Content-Disposition': 'attachment; filename=reporte_clientes.xlsx'
+                }
+            });
+        }
+
+        return NextResponse.json(reportData);
 
     } catch (error) {
         console.error('Error fetching clients report:', error);
