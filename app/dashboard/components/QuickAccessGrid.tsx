@@ -1,8 +1,13 @@
+import React from 'react';
+import Link from "next/link";
+
+// Importamos tus iconos locales existentes
 import PackageIcon from "@/components/icons/PackageIcon";
 import ShoppingCartIcon from "@/components/icons/ShoppingCartIcon";
 import UsersIcon from "@/components/icons/UsersIcon";
 import TruckIcon from "@/components/icons/TruckIcon";
-import Link from "next/link";
+// Importamos el nuevo icono de Precios
+import PriceTagIcon from "@/components/icons/PriceTagIcon"; 
 
 const QuickAccessCard = ({
   title,
@@ -16,26 +21,12 @@ const QuickAccessCard = ({
   color: string;
 }) => {
   const colorClasses: { [key: string]: { bg: string; hover: string; icon: string } } = {
-    blue: {
-      bg: 'bg-blue-50',
-      hover: 'hover:bg-blue-100',
-      icon: 'text-blue-600'
-    },
-    green: {
-      bg: 'bg-green-50',
-      hover: 'hover:bg-green-100',
-      icon: 'text-green-600'
-    },
-    purple: {
-      bg: 'bg-purple-50',
-      hover: 'hover:bg-purple-100',
-      icon: 'text-purple-600'
-    },
-    orange: {
-      bg: 'bg-orange-50',
-      hover: 'hover:bg-orange-100',
-      icon: 'text-orange-600'
-    }
+    blue: { bg: 'bg-blue-50', hover: 'hover:bg-blue-100', icon: 'text-blue-600' },
+    green: { bg: 'bg-green-50', hover: 'hover:bg-green-100', icon: 'text-green-600' },
+    purple: { bg: 'bg-purple-50', hover: 'hover:bg-purple-100', icon: 'text-purple-600' },
+    orange: { bg: 'bg-orange-50', hover: 'hover:bg-orange-100', icon: 'text-orange-600' },
+    // Definimos el estilo ROJO para precios
+    red: { bg: 'bg-red-50', hover: 'hover:bg-red-100', icon: 'text-red-600' }
   };
 
   const colors = colorClasses[color] || colorClasses.blue;
@@ -67,7 +58,9 @@ const QuickAccessGrid = () => {
       <p className="text-sm text-gray-600 mb-6">
         Módulos principales del sistema
       </p>
-      <div className="grid grid-cols-2 gap-4">
+      
+      {/* Ajuste de grid a 3 columnas en pantallas medianas para acomodar el 5to elemento */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <QuickAccessCard
           title="Inventario"
           icon={<PackageIcon className="h-8 w-8" />}
@@ -91,6 +84,13 @@ const QuickAccessGrid = () => {
           icon={<TruckIcon className="h-8 w-8" />}
           href="/dashboard/proveedores"
           color="orange"
+        />
+        {/* Aquí integramos tu nuevo icono */}
+        <QuickAccessCard
+          title="Precios"
+          icon={<PriceTagIcon className="h-8 w-8" />}
+          href="/dashboard/precios"
+          color="red"
         />
       </div>
     </div>

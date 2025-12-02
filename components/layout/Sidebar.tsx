@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { ReactElement } from "react";
+import { useState, ReactElement } from "react";
+// 1. Importamos tu icono local
+import PriceTagIcon from "@/components/icons/PriceTagIcon";
 
 type SubMenuItem = {
   title: string;
@@ -66,7 +67,16 @@ const Sidebar = () => {
       ],
     },
     {
-
+      title: "Precios",
+      // Quitamos el href directo para que no navegue, sino que abra el menú
+      icon: <PriceTagIcon className="w-5 h-5" />, 
+      submenu: [
+        { title: "Listado de Precios", href: "/dashboard/precios/listado" },
+        { title: "Actualización Masiva", href: "/dashboard/precios/masiva" },
+        { title: "Historial", href: "/dashboard/precios/historial" }, // Nombre corregido
+      ],
+    },
+    {
       title: "Proveedores",
       href: "/dashboard/proveedores",
       icon: (
@@ -321,12 +331,22 @@ const Sidebar = () => {
             href="/cliente/catalogo"
             className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors group"
           >
-            {/* ... (icono) ... */}
+            <svg
+              className="w-4 h-4 text-gray-400 group-hover:text-gray-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+              />
+            </svg>
             <span className="text-sm">Ver como Cliente</span>
           </Link>
 
-          {/* ¡¡AQUÍ ESTÁ!!
-           */}
           <Link
             href="/"
             className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors group"
@@ -348,7 +368,7 @@ const Sidebar = () => {
           </Link>
         </div>
       )}
-      {/* Footer de usuario igual... */}
+      {/* Footer de usuario */}
       <div className="p-4 border-t border-gray-200 bg-gray-50/50 mt-auto">
         <div
           className={`flex items-center gap-3 ${
