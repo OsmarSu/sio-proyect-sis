@@ -1,22 +1,22 @@
 // app/dashboard/reportes/clientes/page.tsx
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { Users, Star } from 'lucide-react';
 
 // Función de traducción para los rangos de fecha
 const translateDateRange = (range: string) => {
-  switch (range) {
-    case 'today': return 'Hoy';
-    case 'week': return 'Esta Semana';
-    case 'month': return 'Este Mes';
-    case 'year': return 'Este Año';
-    case 'custom': return 'Personalizado';
-    default: return range;
-  }
-};
+    switch (range) {
+      case 'today': return 'Hoy';
+      case 'week': return 'Esta Semana';
+      case 'month': return 'Este Mes';
+      case 'year': return 'Este Año';
+      case 'custom': return 'Personalizado';
+      default: return range;
+    }
+  };
 
 // Colores de tu paleta (referencia)
 const PRIMARY_COLOR = '#5556EE';
@@ -27,7 +27,7 @@ const DANGER_COLOR = '#DE6415';
 
 const PIE_COLORS_CLIENTES = [PRIMARY_COLOR, SECONDARY_COLOR, ACCENT_COLOR, SUCCESS_COLOR, DANGER_COLOR];
 
-function ClientesReportContent() {
+function ClientesReportPage() {
   const searchParams = useSearchParams();
   const dateRange = searchParams.get('range') || 'month';
 
@@ -37,22 +37,22 @@ function ClientesReportContent() {
 
   useEffect(() => {
     const fetchReportData = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const res = await fetch(`/api/reports/clientes?range=${dateRange}`);
-        if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.error || 'Error al cargar los datos del reporte de clientes.');
+        setIsLoading(true);
+        setError(null);
+        try {
+            const res = await fetch(`/api/reports/clientes?range=${dateRange}`);
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error || 'Error al cargar los datos del reporte de clientes.');
+            }
+            const data = await res.json();
+            setReportData(data);
+        } catch (err: any) {
+            setError(err.message);
+            console.error('Error fetching clientes report data:', err);
+        } finally {
+            setIsLoading(false);
         }
-        const data = await res.json();
-        setReportData(data);
-      } catch (err: any) {
-        setError(err.message);
-        console.error('Error fetching clientes report data:', err);
-      } finally {
-        setIsLoading(false);
-      }
     };
     fetchReportData();
   }, [dateRange]);
@@ -66,7 +66,7 @@ function ClientesReportContent() {
   }
 
   if (!reportData || (!reportData.clientesPorTipo?.length && !reportData.clientesTopCompras?.length && !reportData.clientActivityLog?.length)) {
-    return <div className="text-center p-8 text-gray-600">No hay datos disponibles para el reporte de clientes.</div>;
+      return <div className="text-center p-8 text-gray-600">No hay datos disponibles para el reporte de clientes.</div>;
   }
 
   return (
@@ -82,7 +82,7 @@ function ClientesReportContent() {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-
+                  
                   outerRadius={100}
                   dataKey="valor"
                 >
@@ -104,7 +104,7 @@ function ClientesReportContent() {
               <BarChart data={reportData.clientesTopCompras}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="cliente" />
-
+                
                 <Tooltip formatter={(value: number, name: string) => [`Bs. ${value.toLocaleString('es-BO')}`, name]} />
                 <Legend />
                 <Bar dataKey="totalGastado" fill={PRIMARY_COLOR} name="Total Gastado (Bs.)" />
@@ -145,10 +145,4 @@ function ClientesReportContent() {
   );
 }
 
-export default function ClientesReportPage() {
-  return (
-    <Suspense fallback={<div className="text-center p-8">Cargando...</div>}>
-      <ClientesReportContent />
-    </Suspense>
-  );
-}
+export default ClientesReportPage;
