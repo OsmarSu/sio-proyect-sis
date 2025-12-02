@@ -11,6 +11,7 @@ const Sidebar = () => {
   // ✅ ESTADO DINÁMICO: Controla qué menús están abiertos
   // Inicializamos basados en la URL actual para que al recargar siga abierto donde estabas
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({
+    Usuarios: pathname.startsWith('/dashboard/usuarios'),
     Productos: pathname.startsWith('/dashboard/productos'),
     Reportes: pathname.startsWith('/dashboard/reportes'),
   });
@@ -39,6 +40,21 @@ const Sidebar = () => {
       href: '/dashboard',
     },
     {
+      title: 'Usuarios',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+          />
+        </svg>
+      ),
+      href: '/dashboard/usuarios',
+      children: [
+        { title: 'Gestión de Usuarios', href: '/dashboard/usuarios' },
+      ],
+    },
+
+    {
       title: 'Productos',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,7 +62,6 @@ const Sidebar = () => {
         </svg>
       ),
       href: '/dashboard/productos',
-      // ✅ SUB-MÓDULOS ACTIVADOS
       children: [
         { title: 'Catálogo', href: '/dashboard/productos' }, 
         { title: 'Nuevo Producto', href: '/dashboard/productos/nuevo' },
@@ -164,7 +179,7 @@ const Sidebar = () => {
               }`}
             >
               <Link
-                href={item.children ? '#' : item.href} // Si tiene hijos, el link padre no navega, solo colapsa
+                href={item.children ? '#' : item.href}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${
                   isActive(item.href)
                     ? `bg-[${COLOR_PRIMARY}]/10 text-[${COLOR_PRIMARY}] shadow-sm`
@@ -172,7 +187,7 @@ const Sidebar = () => {
                 }`}
                 onClick={item.children ? (e) => {
                     e.preventDefault(); 
-                    toggleMenu(item.title); // ✅ Usamos la función genérica
+                    toggleMenu(item.title);
                 } : undefined}
               >
                 {/* Indicador lateral para item activo */}
@@ -192,7 +207,7 @@ const Sidebar = () => {
                   <span className="font-medium text-sm flex-1">{item.title}</span>
                 )}
 
-                {/* Ícono de flecha para desplegar (solo si no está colapsado y tiene hijos) */}
+                {/* Ícono de flecha para desplegar */}
                 {!isCollapsed && item.children && (
                   <svg
                     className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
@@ -215,7 +230,7 @@ const Sidebar = () => {
               </Link>
             </div>
 
-            {/* Sub-menú Genérico */}
+            {/* Sub-menú */}
             {!isCollapsed && item.children && expandedMenus[item.title] && (
               <div className="ml-6 border-l border-gray-200 pl-3 space-y-1 mt-1 animate-in slide-in-from-top-1 fade-in-20 duration-200">
                 {item.children.map((subItem) => (
