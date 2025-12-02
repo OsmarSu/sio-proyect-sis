@@ -1,4 +1,3 @@
-// components/layout/Sidebar.tsx
 'use client';
 
 import Link from "next/link";
@@ -26,10 +25,25 @@ const Sidebar = () => {
   const [productsExpanded, setProductsExpanded] = useState(pathname.startsWith('/dashboard/productos')); // NUEVO ESTADO
   const [isCollapsed, setIsCollapsed] = useState(false);
 
+  // ✅ ESTADO DINÁMICO: Controla qué menús están abiertos
+  // Inicializamos basados en la URL actual para que al recargar siga abierto donde estabas
+  const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({
+    Productos: pathname.startsWith('/dashboard/productos'),
+    Reportes: pathname.startsWith('/dashboard/reportes'),
+  });
+
   // Colores de tu paleta
   const COLOR_PRIMARY = '#5556EE';
   const COLOR_SECONDARY = '#8150CE';
-  const COLOR_ACCENT = '#2EB4D1'; // Usado para el resaltado del submenú
+  const COLOR_ACCENT = '#2EB4D1';
+
+  // Función para alternar menús
+  const toggleMenu = (title: string) => {
+    setExpandedMenus((prev) => ({
+      ...prev,
+      [title]: !prev[title],
+    }));
+  };
 
   const menuItems = [
     {
@@ -88,7 +102,7 @@ const Sidebar = () => {
       title: 'Inventario',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
         </svg>
       ),
       href: '/dashboard/inventario',
@@ -102,7 +116,7 @@ const Sidebar = () => {
       ),
       href: '/dashboard/ventas',
     },
-    { // Opción de Reportes con sub-menú
+    {
       title: 'Reportes',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,7 +145,7 @@ const Sidebar = () => {
     <aside
       className={`${
         isCollapsed ? 'w-20' : 'w-64'
-      } bg-white border-r border-gray-200 transition-all duration-300 ease-in-out flex flex-col shadow-sm`}
+      } bg-white border-r border-gray-200 transition-all duration-300 ease-in-out flex flex-col shadow-sm h-screen sticky top-0`}
     >
       {/* Logo y Toggle */}
       <div className="p-6 flex items-center justify-between border-b border-gray-200">
@@ -164,33 +178,29 @@ const Sidebar = () => {
         >
           <svg
             className={`w-5 h-5 text-gray-600 group-hover:text-[${COLOR_PRIMARY}] transition-all ${
+            className={`w-5 h-5 text-gray-600 group-hover:text-[${COLOR_PRIMARY}] transition-all ${
               isCollapsed ? 'rotate-180' : ''
             }`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
           </svg>
         </button>
       </div>
 
       {/* Menú de navegación */}
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto custom-scrollbar">
         {menuItems.map((item) => (
           <React.Fragment key={item.href}>
-            <div // Usamos un div para el item principal que puede tener sub-menú
+            <div
               className={`relative ${
                 item.children ? 'cursor-pointer' : ''
               }`}
             >
               <Link
-                href={item.href}
+                href={item.children ? '#' : item.href} // Si tiene hijos, el link padre no navega, solo colapsa
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${
                   isActive(item.href)
                     ? `bg-oasis-primary-light text-oasis-primary shadow-sm`
@@ -223,10 +233,10 @@ const Sidebar = () => {
                 </span>
 
                 {!isCollapsed && (
-                  <span className="font-medium text-sm">{item.title}</span>
+                  <span className="font-medium text-sm flex-1">{item.title}</span>
                 )}
 
-                {/* Ícono de flecha para desplegar */}
+                {/* Ícono de flecha para desplegar (solo si no está colapsado y tiene hijos) */}
                 {!isCollapsed && item.children && (
                   <svg
                     className={`w-4 h-4 ml-auto text-gray-400 transition-transform duration-200 ${
@@ -244,7 +254,7 @@ const Sidebar = () => {
 
                 {/* Tooltip para modo colapsado */}
                 {isCollapsed && (
-                  <div className="absolute left-full ml-2 px-3 py-1 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap">
+                  <div className="absolute left-full ml-2 px-3 py-1 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
                     {item.title}
                   </div>
                 )}

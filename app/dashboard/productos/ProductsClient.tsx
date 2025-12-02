@@ -1,42 +1,66 @@
 // app/dashboard/productos/ProductsClient.tsx
 "use client";
-import { createProductAction } from "@/app/actions/product-actions";
-import { useState, useMemo } from "react";
+
+import { useState, useMemo, useEffect } from "react";
 import { Plus, Search } from "lucide-react";
-import ProductCard from "./components/ProductCard"; // Asegúrate de tener este componente
-import ProductModal from "./components/ProductModal"; // Asegúrate de tener este componente
+import ProductCard from "./components/ProductCard";
+import ProductModal from "./components/ProductModal";
 import { Product, ProductFormData } from "./types";
+import { useRouter } from "next/navigation";
+import {
+  createProductAction,
+  deleteProductAction,
+  updateProductAction,
+} from "@/app/actions/product-actions";
 
 interface ProductsClientProps {
-  initialProducts: Product[]; // <--- Aquí recibimos los datos de la BD
+  initialProducts: Product[];
 }
 
-export default function ProductsClient({ initialProducts }: ProductsClientProps) {
-  // Inicializamos el estado con los datos reales que vienen del servidor
+export default function ProductsClient({
+  initialProducts,
+}: ProductsClientProps) {
+  const router = useRouter();
+
+  // Estado local
   const [products, setProducts] = useState<Product[]>(initialProducts);
-  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
+  // Filtros
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [showLowStock, setShowLowStock] = useState(false);
 
-  // Lógica de filtrado (Mantenemos tu lógica, es excelente)
+  // Sincronización con el servidor
+  useEffect(() => {
+    setProducts(initialProducts);
+  }, [initialProducts]);
+
+  // 🔍 LÓGICA DE FILTRADO CORREGIDA (Sin campos fantasma)
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
+      // 1. Búsqueda: Por Nombre o por ID (ya no hay CODE/SKU)
       const matchesSearch =
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.code.toLowerCase().includes(searchTerm.toLowerCase());
+        product.id.toString().includes(searchTerm); // Buscamos por ID numérico
+
+      // 2. Categoría
       const matchesCategory =
         !categoryFilter || product.category === categoryFilter;
+
+      // 3. Stock Bajo: Como no tenemos 'minStock' en la DB,
+      // usaremos un umbral fijo (ej: 5) o verificamos si es 0.
+      const UMBRAL_STOCK_BAJO = 5;
       const matchesStock =
-        !showLowStock || product.currentStock <= product.minStock;
+        !showLowStock || product.stockActual <= UMBRAL_STOCK_BAJO;
+
       return matchesSearch && matchesCategory && matchesStock;
     });
   }, [products, searchTerm, categoryFilter, showLowStock]);
 
-  // Extraer categorías dinámicamente de los productos reales
+  // Extraer categorías únicas
   const categories = useMemo(
     () => Array.from(new Set(products.map((p) => p.category))),
     [products]
@@ -52,49 +76,55 @@ export default function ProductsClient({ initialProducts }: ProductsClientProps)
     setIsModalOpen(true);
   };
 
-  // NOTA: Esto solo borra visualmente. Para borrar en BD necesitaremos una Server Action después.
-  const handleDelete = (id: string) => {
-    if (confirm("¿Estás seguro de eliminar este producto visualmente?")) {
-      setProducts((prev) => prev.filter((p) => p.id !== id));
+  // 🗑️ DELETE: ID ahora es number
+  const handleDelete = async (id: number) => {
+    if (
+      !confirm("¿Estás seguro de eliminar este producto de la Base de Datos?")
+    )
+      return;
+
+    try {
+      const result = await deleteProductAction(id);
+
+      if (result.success) {
+        alert("Producto eliminado correctamente");
+        router.refresh(); // Forzamos recarga para asegurar sincronía
+      } else {
+        alert("Error al eliminar: " + result.error);
+      }
+    } catch (error) {
+      alert("Error de conexión");
     }
   };
 
-  // NOTA: Esto solo guarda visualmente.
- const handleSave = async (data: ProductFormData) => {
-    
-    // CASO 1: EDITAR (Aún no implementado en backend, lo dejamos visual)
-    if (editingProduct) {
-      const updatedProduct: Product = {
-        ...editingProduct,
-        ...data,
-        updatedAt: new Date().toISOString(),
-      };
-      setProducts((prev) =>
-        prev.map((p) => (p.id === editingProduct.id ? updatedProduct : p))
-      );
-      setIsModalOpen(false);
-      setEditingProduct(null);
-      return; 
-    }
+  // 💾 SAVE: Crear y Editar
+  const handleSave = async (data: ProductFormData) => {
+    setIsSaving(true);
 
-    // CASO 2: CREAR NUEVO (Conectado a Supabase)
     try {
-      // 1. Llamamos a la Server Action
-      const result = await createProductAction(data);
+      let result;
+
+      if (editingProduct) {
+        // ID es number
+        result = await updateProductAction(editingProduct.id, data);
+      } else {
+        result = await createProductAction(data);
+      }
 
       if (result.success) {
-        // 2. Si todo salió bien, cerramos el modal.
-        // NO necesitamos actualizar 'setProducts' manualmente porque
-        // revalidatePath del servidor refrescará la página automáticamente.
         setIsModalOpen(false);
         setEditingProduct(null);
-        alert("Producto creado exitosamente en la Nube");
+        router.refresh();
+        // Feedback sutil
+        // alert(editingProduct ? "Producto actualizado" : "Producto creado");
       } else {
         alert("Error: " + result.error);
       }
     } catch (error) {
       console.error(error);
-      alert("Ocurrió un error inesperado");
+      alert("Error inesperado en el servidor");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -112,20 +142,24 @@ export default function ProductsClient({ initialProducts }: ProductsClientProps)
         </div>
         <button
           onClick={handleCreate}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm font-medium transition-colors"
+          disabled={isSaving}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm font-medium transition-colors disabled:opacity-50"
         >
           <Plus size={20} />
-          <span>Nuevo Producto</span>
+          <span>{isSaving ? "Guardando..." : "Nuevo Producto"}</span>
         </button>
       </div>
 
       {/* FILTROS */}
       <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-2.5 text-slate-400" size={20} />
+          <Search
+            className="absolute left-3 top-2.5 text-slate-400"
+            size={20}
+          />
           <input
             type="text"
-            placeholder="Buscar por nombre o SKU..."
+            placeholder="Buscar por nombre o ID..." // Texto actualizado
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
@@ -150,21 +184,29 @@ export default function ProductsClient({ initialProducts }: ProductsClientProps)
             onChange={(e) => setShowLowStock(e.target.checked)}
             className="rounded text-blue-600 focus:ring-blue-500"
           />
-          <span className="text-sm font-medium text-slate-600">Stock Bajo</span>
+          <span className="text-sm font-medium text-slate-600">
+            Stock Bajo (&lt; 5)
+          </span>
         </label>
       </div>
 
       {/* GRID DE TARJETAS */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredProducts.map((prod) => (
-          <ProductCard
-            key={prod.id}
-            product={prod}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        ))}
-      </div>
+      {products.length === 0 ? (
+        <div className="text-center py-20 text-slate-400">
+          <p>No hay productos registrados aún.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredProducts.map((prod) => (
+            <ProductCard
+              key={prod.id}
+              product={prod}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          ))}
+        </div>
+      )}
 
       {/* MODAL */}
       <ProductModal

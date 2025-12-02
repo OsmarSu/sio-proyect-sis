@@ -1,23 +1,41 @@
 // app/dashboard/productos/types.ts
 
-// Esta es la forma que espera tu UI (Tarjetas)
+// 1. Interfaz del Producto que viene de la Base de Datos (Lectura)
 export interface Product {
-  id: string;
-  code: string;
+  id: number;
+  name: string;
+  description: string;
+  
+  // ✅ Nombres en Español (Coinciden con Prisma/DB)
+  stockActual: number; 
+  marca: string;       
+  
+  category: string;
+  linea: string;
+  unidad: string;
+  minorPrice: number;
+  majorPrice: number;
+}
+
+// 2. Interfaz del Formulario (Escritura)
+// Definimos esto manualmente para asegurar que coincida con el Modal
+export interface ProductFormData {
   name: string;
   description: string;
   category: string;
-  supplier: string; // Lo usaremos para la MARCA
-  currentStock: number;
+  
+  // ✅ AQUI ESTABA EL ERROR: Usamos los nombres de la DB
+  marca: string;       // Antes supplier
+  stockActual: number; // Antes currentStock
+  
+  linea: string;
+  unidad: string;
+  minorPrice: number;
+
+  // Campos Visuales / Opcionales (No están en la tabla Producto directamente)
+  code: string;
   minStock: number;
-  majorPrice: number; // Lo usaremos para el COSTO
-  minorPrice: number; // Lo usaremos para el PRECIO DE VENTA
-  ageRange: string;
+  majorPrice: number;
   isNew: boolean;
   isOffer: boolean;
-  active: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
-
-export interface ProductFormData extends Omit<Product, "id" | "createdAt" | "updatedAt"> {}
