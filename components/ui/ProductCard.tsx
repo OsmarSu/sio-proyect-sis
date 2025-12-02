@@ -1,8 +1,14 @@
-interface ProductCardProps {
+// components/ui/ProductCard.tsx
+import Link from 'next/link';
+
+// Definición de las propiedades que el componente espera
+export interface ProductCardProps {
+  id: string;
   name: string;
   description: string;
   price: number;
   image?: string;
+  category?: string; // <-- ¡AÑADIDO AQUÍ!
   emoji?: string;
   className?: string;
   originalPrice?: number;
@@ -13,22 +19,12 @@ interface ProductCardProps {
   isOnSale?: boolean;
 }
 
-export const ProductCard = ({
-  name,
-  description,
-  price,
-  image,
-  emoji = '🎁',
-  className = '',
-  originalPrice,
-  ageRange,
-  rating,
-  stock,
-  isNew,
-  isOnSale
-}: ProductCardProps) => {
+export const ProductCard = (props: ProductCardProps) => {
+  // Ahora sí podemos extraer 'category' sin problemas
+  const { id, name, description, price, image, category, isNew, ageRange, rating, stock, originalPrice, isOnSale, emoji = '🎁', className = '' } = props;
+
   return (
-    <div className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 ${className}`}>
+    <div className={`bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow ${className}`}>
       <div className="relative">
         {/* Imagen del producto */}
         <div className="bg-gray-100 h-56 flex items-center justify-center overflow-hidden">
@@ -44,96 +40,62 @@ export const ProductCard = ({
         </div>
         
         {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-2">
+        <div className="absolute top-2 left-2 flex flex-col space-y-1">
           {isNew && (
-            <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
+            <span className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
               Nuevo
             </span>
           )}
           {isOnSale && (
-            <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md animate-pulse">
+            <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
               Oferta
             </span>
           )}
         </div>
       </div>
       
-      {/* Contenido */}
-      <div className="p-4">
-        <h3 className="font-bold text-lg mb-2 text-gray-900 line-clamp-2 min-h-[56px]">
-          {name}
-        </h3>
-        <p className="text-gray-600 text-sm mb-3 line-clamp-2 min-h-[40px]">
-          {description}
-        </p>
-        
-        {/* Información adicional */}
-        <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
-          {ageRange && (
-            <div className="flex items-center gap-1 text-gray-600 text-sm">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              <span>{ageRange}</span>
-            </div>
-          )}
-          {/*rating && (
-            <div className="flex items-center gap-1">
-              <svg className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-              </svg>
-              <span className="text-sm font-semibold text-gray-700">{rating}</span>
-            </div>
-          )*/}
-        </div>
-        
-        {/* Precio y botón */}
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-2xl text-blue-600">
-              Bs. {price.toFixed(2)}
-            </span>
-            {originalPrice && originalPrice > price && (
-              <span className="text-sm text-gray-400 line-through">
-                Bs. {originalPrice.toFixed(2)}
-              </span>
-            )}
+      <h3 className="font-semibold text-lg mb-2 text-gray-900 line-clamp-2">{name}</h3>
+      <p className="text-gray-600 text-sm mb-3 line-clamp-2">{description}</p>
+      
+      {/* Información adicional */}
+      <div className="flex items-center justify-between mb-3">
+        {ageRange && (
+          <span className="text-gray-500 text-sm">{ageRange}</span>
+        )}
+        {rating && (
+          <div className="flex items-center">
+            <span className="text-yellow-400">★</span>
+            <span className="text-sm text-gray-600 ml-1">{rating}</span>
           </div>
-          
-          {/* Stock */}
-          {stock !== undefined && (
-            <div className="mb-2">
-              {stock > 10 ? (
-                <span className="text-green-600 text-sm font-medium">
-                  ✓ En stock
-                </span>
-              ) : stock > 0 ? (
-                <span className="text-orange-500 text-sm font-medium">
-                  ⚠ Solo quedan {stock}
-                </span>
-              ) : (
-                <span className="text-red-500 text-sm font-medium">
-                  ✗ Agotado
-                </span>
-              )}
-            </div>
-          )}
-          
-          {/*<button 
-            disabled={stock === 0}
-            className={`w-full py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${
-              stock === 0
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transform hover:scale-105'
-            }`}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            {stock === 0 ? 'Agotado' : 'Agregar al Carrito'}
-          </button>*/}
-        </div>
+        )}
       </div>
+      
+      {/* Precio y botón */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-2">
+          <span className="font-bold text-indigo-600">${price.toFixed(2)}</span>
+          {originalPrice && originalPrice > price && (
+            <span className="text-sm text-gray-500 line-through">
+              ${originalPrice.toFixed(2)}
+            </span>
+          )}
+        </div>
+        <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 text-sm">
+          Agregar
+        </button>
+      </div>
+      
+      {/* Stock bajo */}
+      {stock !== undefined && stock < 10 && stock > 0 && (
+        <p className="text-orange-500 text-xs mt-2">
+          Solo quedan {stock}
+        </p>
+      )}
+      {stock === 0 && (
+        <p className="text-red-500 text-xs mt-2">
+          Agotado
+        </p>
+      )}
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React from "react";
 import Sidebar from "@/components/layout/Sidebar";
+import Footer from "@/components/layout/Footer";
 
 export default function DashboardLayout({
   children,
@@ -57,6 +58,9 @@ export default function DashboardLayout({
           <div className="p-8">
             {children}
           </div>
+          
+          {/* Footer */}
+          <Footer />
         </div>
       </main>
     </div>

@@ -1,20 +1,18 @@
-// components/Providers.tsx
-'use client';
+"use client";
 
-import { ThemeProvider } from 'next-themes'; // Asumo que tienes un ThemeProvider
-import { AuthProvider } from '@/contexts/AuthContext'; // 1. IMPORTAMOS EL AUTH PROVIDER
-import { ReactNode } from 'react';
+import React from "react";
+import { SessionProvider } from "next-auth/react";
+import { ThemeProvider } from "next-themes";
+import { Toaster } from "react-hot-toast";
 
-// Este componente envuelve toda la aplicación con los diferentes proveedores de contexto.
-export default function Providers({ children }: { children: ReactNode }) {
+export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    // Es posible que tengas otros providers aquí, como ThemeProvider. Mantenlos.
-    // El orden no suele importar mucho, pero poner AuthProvider dentro está bien.
-    <ThemeProvider attribute="class" defaultTheme="dark">
-      {/* 2. ENVOLVEMOS 'children' CON EL AUTHPROVIDER */}
-      <AuthProvider>
+    <SessionProvider>
+      <ThemeProvider attribute="class">
         {children}
-      </AuthProvider>
-    </ThemeProvider>
+        <Toaster position="top-right" />
+      </ThemeProvider>
+    </SessionProvider>
   );
 }
+

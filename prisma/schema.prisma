@@ -677,6 +677,7 @@ model EventosBloqueoUsuario {
 
   @@map("eventos_bloqueo")
 }
+// ... (Despues de todos tus otros modelos)
 
 model AlertaSeguridad {
   id                  Int      @id @default(autoincrement()) @map("alerta_seguridad_id")
