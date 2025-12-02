@@ -1,4 +1,3 @@
-// app/dashboard/clientes/hooks/useClients.ts
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -11,7 +10,7 @@ const DUMMY_CLIENTS: Client[] = [
     email: 'ana.garcia@example.com',
     phone: '71234567',
     address: 'Av. Siempre Viva 123, Santa Cruz',
-    loyaltyPoints: 150,
+    // loyaltyPoints eliminado
     isActive: true,
     registeredAt: '2023-01-10',
   },
@@ -21,7 +20,7 @@ const DUMMY_CLIENTS: Client[] = [
     email: 'juan.perez@example.com',
     phone: '78765432',
     address: 'Calle Falsa 456, La Paz',
-    loyaltyPoints: 300,
+    // loyaltyPoints eliminado
     isActive: true,
     registeredAt: '2023-03-22',
   },
@@ -31,7 +30,7 @@ const DUMMY_CLIENTS: Client[] = [
     email: 'maria.lopez@example.com',
     phone: '60123456',
     address: 'Zona Central, El Alto',
-    loyaltyPoints: 50,
+    // loyaltyPoints eliminado
     isActive: false,
     registeredAt: '2023-06-01',
   },
@@ -58,24 +57,24 @@ export const useClients = () => {
     });
   }, [clients, searchTerm, filterActive]);
 
-  const saveClient = (clientData: ClientFormData & { id?: string; isActive?: boolean; loyaltyPoints?: number; registeredAt?: string }) => {
+  const saveClient = (clientData: ClientFormData & { id?: string; isActive?: boolean }) => {
     if (clientData.id) {
-      // Modo Edición
+      // Editar
       setClients(prev =>
         prev.map(client =>
           client.id === clientData.id
-            ? { ...client, ...clientData } as Client // Forzar tipo para actualizar todo
+            ? { ...client, ...clientData } as Client
             : client
         )
       );
     } else {
-      // Modo Creación
+      // Crear
       const newClient: Client = {
         ...clientData,
-        id: `C${Date.now()}`, // Generar un ID simple
-        loyaltyPoints: 0,
+        id: `C${Date.now()}`,
+        // loyaltyPoints eliminado
         isActive: true,
-        registeredAt: new Date().toISOString().split('T')[0], // Fecha actual
+        registeredAt: new Date().toISOString().split('T')[0],
       };
       setClients(prev => [newClient, ...prev]);
     }

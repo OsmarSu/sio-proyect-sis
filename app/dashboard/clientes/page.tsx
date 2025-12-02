@@ -1,11 +1,10 @@
-// app/dashboard/clientes/page.tsx
 'use client';
 
 import React, { useState } from 'react';
 import { useClients } from './hooks/useClients';
 import { Client } from './types';
 import ClientModal from './components/ClientModal';
-import { Search, UserPlus, Phone, Mail, MapPin, Award } from 'lucide-react'; // Iconos relevantes
+import { Search, UserPlus, Phone, Mail, MapPin } from 'lucide-react';
 
 export default function ClientsPage() {
   const {
@@ -23,9 +22,9 @@ export default function ClientsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [clientToEdit, setClientToEdit] = useState<Client | null>(null);
 
-  // Lógica de paginación simulada
+  // Paginación simple
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // Mostrar 5 clientes por página
+  const itemsPerPage = 5;
   const totalPages = Math.ceil(filteredCount / itemsPerPage);
   const paginatedClients = clients.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
@@ -39,11 +38,9 @@ export default function ClientsPage() {
     setIsModalOpen(true);
   };
 
-  const goToNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-  const goToPrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
-
   return (
     <div className="p-6 space-y-6">
+      {/* Encabezado con Botón Mejorado */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Gestión de Clientes</h1>
@@ -51,16 +48,18 @@ export default function ClientsPage() {
             Total: {totalClients} clientes ({filteredCount} filtrados)
           </p>
         </div>
+        
+        {/* BOTÓN NUEVO CLIENTE (MEJORADO) */}
         <button
           onClick={handleOpenCreateClient}
-          className="bg-oasis-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-sm"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-md font-medium active:scale-95"
         >
           <UserPlus className="w-5 h-5" />
-          <span>Nuevo Cliente</span>
+          <span>Registrar Nuevo Cliente</span>
         </button>
       </div>
 
-      {/* Filtros y Búsqueda */}
+      {/* Barra de Filtros */}
       <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row gap-4 items-center">
         <div className="relative w-full md:w-1/2">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -69,13 +68,13 @@ export default function ClientsPage() {
             placeholder="Buscar por nombre, email o teléfono..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-oasis-primary outline-none"
+            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
           />
         </div>
         <select
           value={filterActive}
           onChange={(e) => setFilterActive(e.target.value as 'all' | 'active' | 'inactive')}
-          className="w-full md:w-1/4 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-oasis-primary outline-none bg-white"
+          className="w-full md:w-1/4 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
         >
           <option value="all">Todos los clientes</option>
           <option value="active">Solo activos</option>
@@ -83,7 +82,7 @@ export default function ClientsPage() {
         </select>
       </div>
 
-      {/* Lista de Clientes */}
+      {/* Tabla de Clientes */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -95,9 +94,7 @@ export default function ClientsPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contacto
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Puntos
-                </th>
+                {/* COLUMNA PUNTOS ELIMINADA AQUÍ */}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Estado
                 </th>
@@ -126,15 +123,11 @@ export default function ClientsPage() {
                       </div>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    <div className="flex items-center gap-1">
-                      <Award className="w-4 h-4 text-yellow-500" /> {client.loyaltyPoints}
-                    </div>
-                  </td>
+                  {/* CELDA PUNTOS ELIMINADA AQUÍ */}
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        client.isActive ? 'bg-oasis-success-light text-oasis-success' : 'bg-oasis-danger-light text-oasis-danger'
+                        client.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                       }`}
                     >
                       {client.isActive ? 'Activo' : 'Inactivo'}
@@ -143,13 +136,13 @@ export default function ClientsPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
                       onClick={() => handleOpenEditClient(client)}
-                      className="text-oasis-primary hover:text-blue-900 mr-4"
+                      className="text-blue-600 hover:text-blue-900 mr-4 font-medium"
                     >
                       Editar
                     </button>
                     <button
                       onClick={() => deleteClient(client.id)}
-                      className="text-oasis-danger hover:text-red-900"
+                      className="text-red-600 hover:text-red-900 font-medium"
                     >
                       Eliminar
                     </button>
@@ -172,19 +165,19 @@ export default function ClientsPage() {
         {/* Paginación */}
         <div className="bg-white px-4 py-3 border-t border-gray-200 flex items-center justify-between sm:px-6">
           <div className="text-sm text-gray-500">
-            Mostrando <span className="font-medium text-gray-800">{(currentPage - 1) * itemsPerPage + 1}</span> a <span className="font-medium text-gray-800">{Math.min(currentPage * itemsPerPage, filteredCount)}</span> de{" "}
-            <span className="font-medium text-gray-800">{filteredCount}</span> resultados
+            Mostrando <span className="font-medium text-gray-900">{(currentPage - 1) * itemsPerPage + 1}</span> a <span className="font-medium text-gray-900">{Math.min(currentPage * itemsPerPage, filteredCount)}</span> de{" "}
+            <span className="font-medium text-gray-900">{filteredCount}</span> resultados
           </div>
           <div className="flex gap-2">
             <button
-              onClick={goToPrevPage}
+              onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
               disabled={currentPage === 1}
               className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Anterior
             </button>
             <button
-              onClick={goToNextPage}
+              onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
               disabled={currentPage === totalPages || filteredCount === 0}
               className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >

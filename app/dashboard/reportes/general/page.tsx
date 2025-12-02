@@ -1,55 +1,69 @@
-// app/dashboard/reportes/general/page.tsx
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
-import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { TrendingUp, TrendingDown, DollarSign, Package, Users, ShoppingCart } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { 
+  LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
+} from 'recharts';
+import { 
+  TrendingUp, TrendingDown, DollarSign, Package, Users, ShoppingCart, 
+  Plus, Trash2, Download, Layers, Loader2
+} from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
+import CustomReportModal from '../components/CustomReportModal'; 
+import { SavedReport } from '../types';
 
-// Función de traducción para los rangos de fecha
 const translateDateRange = (range: string) => {
     switch (range) {
-        case 'today': return 'Hoy';
-        case 'week': return 'Esta Semana';
-        case 'month': return 'Este Mes';
-        case 'year': return 'Este Año';
-        case 'custom': return 'Personalizado';
-        default: return range;
+      case 'today': return 'Hoy';
+      case 'week': return 'Esta Semana';
+      case 'month': return 'Este Mes';
+      case 'year': return 'Este Año';
+      default: return range;
     }
 };
 
-function GeneralReportPage() {
+export default function GeneralReportPage() {
     const searchParams = useSearchParams();
     const dateRange = searchParams.get('range') || 'month';
 
-    // Colores de tu paleta (referencia)
+    const [reportData, setReportData] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    
+    const [customReports, setCustomReports] = useState<SavedReport[]>([
+        { 
+            id: '1', 
+            title: 'Cierre Consolidado Enero', 
+            type: 'Personalizado', 
+            includedModules: ['Ventas', 'Inventario'], 
+            dateRange: 'Este Mes', 
+            format: 'PDF', 
+            generatedAt: '2024-01-31 23:00', 
+            generatedBy: 'Admin', 
+            status: 'Listo' 
+        }
+    ]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    // Estado para controlar qué reporte se está descargando (spinner en el botón)
+    const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
     const PRIMARY_COLOR = '#5556EE';
     const SECONDARY_COLOR = '#8150CE';
     const SUCCESS_COLOR = '#74AB41';
     const DANGER_COLOR = '#DE6415';
     const ACCENT_COLOR = '#2EB4D1';
-
     const PIE_CHART_COLORS = [PRIMARY_COLOR, SECONDARY_COLOR, DANGER_COLOR, SUCCESS_COLOR, ACCENT_COLOR];
-
-    const [reportData, setReportData] = useState<any>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchReportData = async () => {
             setIsLoading(true);
-            setError(null);
             try {
                 const res = await fetch(`/api/reports/general?range=${dateRange}`);
-                if (!res.ok) {
-                    const errorData = await res.json();
-                    throw new Error(errorData.error || 'Error al cargar los datos del reporte.');
+                if (res.ok) {
+                    const data = await res.json();
+                    setReportData(data);
                 }
-                const data = await res.json();
-                setReportData(data);
-            } catch (err: any) {
-                setError(err.message);
-                console.error('Error fetching general report data:', err);
+            } catch (err) {
+                console.error(err);
             } finally {
                 setIsLoading(false);
             }
@@ -57,113 +71,205 @@ function GeneralReportPage() {
         fetchReportData();
     }, [dateRange]);
 
-    if (isLoading) {
-        return <div className="text-center p-8">Cargando reporte general...</div>;
-    }
+    const handleSaveCustomReport = (newReportData: Partial<SavedReport>) => {
+        const newReport: SavedReport = {
+            id: Math.random().toString(36).substr(2, 9),
+            title: newReportData.title!,
+            type: 'Personalizado',
+            includedModules: newReportData.includedModules,
+            dateRange: newReportData.dateRange!,
+            format: newReportData.format!,
+            generatedAt: new Date().toLocaleString(),
+            generatedBy: 'Usuario Actual',
+            status: 'Listo'
+        };
+        setCustomReports([newReport, ...customReports]);
+    };
 
-    if (error) {
-        return <div className="text-center p-8 text-red-600">Error: {error}</div>;
-    }
+    const handleDeleteReport = (id: string) => {
+        if(confirm('¿Eliminar este reporte personalizado?')) {
+            setCustomReports(prev => prev.filter(r => r.id !== id));
+        }
+    };
 
-    if (!reportData) {
-        return <div className="text-center p-8 text-gray-600">No hay datos disponibles para el reporte general.</div>;
-    }
+    // === NUEVA FUNCIÓN DE DESCARGA ===
+    const handleDownloadReport = async (report: SavedReport) => {
+        setDownloadingId(report.id);
+        try {
+            const apiRangeMap: Record<string, string> = {
+                'Hoy': 'today', 'Esta Semana': 'week', 'Este Mes': 'month', 'Este Año': 'year'
+            };
+            const params = new URLSearchParams();
+            params.set('format', report.format.toLowerCase());
+            params.set('range', apiRangeMap[report.dateRange] || 'month');
+
+            const response = await fetch(`/api/reports/general?${params.toString()}`);
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${report.title}.${report.format === 'Excel' ? 'xlsx' : 'pdf'}`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            } else {
+                alert("Error al descargar el archivo.");
+            }
+        } catch (error) {
+            console.error("Error descarga:", error);
+            alert("Ocurrió un error.");
+        } finally {
+            setDownloadingId(null);
+        }
+    };
+
+    if (isLoading) return <div className="p-8 text-center text-gray-500">Cargando métricas...</div>;
+    if (!reportData) return <div className="p-8 text-center">No hay datos disponibles.</div>;
 
     return (
-        <div>
-            {/* Métricas Principales */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                {reportData.metrics.map((metrica: any, index: number) => (
-                    <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-                        <div className="flex items-start justify-between mb-4">
-                            <div className={`${metrica.trend === 'up' ? 'bg-oasis-success-light' : 'bg-oasis-danger-light'} p-3 rounded-xl`}>
-                                {metrica.titulo === 'Ventas Totales' && <DollarSign className={`w-6 h-6 ${metrica.trend === 'up' ? 'text-oasis-success' : 'text-oasis-danger'}`} />}
-                                {metrica.titulo === 'Productos Vendidos' && <Package className={`w-6 h-6 ${metrica.trend === 'up' ? 'text-oasis-success' : 'text-oasis-danger'}`} />}
-                                {metrica.titulo === 'Clientes Nuevos' && <Users className={`w-6 h-6 ${metrica.trend === 'up' ? 'text-oasis-success' : 'text-oasis-danger'}`} />}
-                                {metrica.titulo === 'Ticket Promedio' && <ShoppingCart className={`w-6 h-6 ${metrica.trend === 'up' ? 'text-oasis-success' : 'text-oasis-danger'}`} />}
+        <div className="space-y-10">
+            <section>
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-bold text-gray-800">Vista Rápida: Métricas Generales</h2>
+                    <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                        {translateDateRange(dateRange)}
+                    </span>
+                </div>
+                {/* ... (Métricas y Gráficos iguales, omitidos para brevedad) ... */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    {reportData.metrics.map((metrica: any, index: number) => (
+                        <div key={index} className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
+                            <div className="flex justify-between items-start mb-4">
+                                <div className={`p-3 rounded-lg ${metrica.trend === 'up' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                                    {metrica.titulo.includes('Ventas') ? <DollarSign className="w-6 h-6" /> : 
+                                     metrica.titulo.includes('Productos') ? <Package className="w-6 h-6" /> :
+                                     metrica.titulo.includes('Clientes') ? <Users className="w-6 h-6" /> : <ShoppingCart className="w-6 h-6" />}
+                                </div>
+                                <span className={`flex items-center text-sm font-semibold ${metrica.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+                                    {metrica.trend === 'up' ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
+                                    {metrica.cambio}
+                                </span>
                             </div>
-                            <div className={`flex items-center gap-1 ${metrica.trend === 'up' ? 'text-oasis-success' : 'text-oasis-danger'} text-sm font-semibold`}>
-                                {metrica.trend === 'up' ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                                {metrica.cambio}
-                            </div>
+                            <h3 className="text-gray-500 text-sm">{metrica.titulo}</h3>
+                            <p className="text-2xl font-bold text-gray-900 mt-1">{metrica.valor}</p>
                         </div>
-                        <h3 className="text-gray-600 text-sm mb-1">{metrica.titulo}</h3>
-                        <p className="text-3xl font-bold text-gray-900">{metrica.valor}</p>
+                    ))}
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                        <h3 className="font-bold text-gray-800 mb-4">Tendencia de Ventas</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <LineChart data={reportData.ventasMensuales}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                                <XAxis dataKey="mes" axisLine={false} tickLine={false} tick={{fill: '#6B7280'}} />
+                                <YAxis axisLine={false} tickLine={false} tick={{fill: '#6B7280'}} />
+                                <Tooltip contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
+                                <Line type="monotone" dataKey="ventas" stroke={PRIMARY_COLOR} strokeWidth={3} dot={{r: 4}} activeDot={{r: 6}} />
+                            </LineChart>
+                        </ResponsiveContainer>
                     </div>
-                ))}
-            </div>
+                    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                        <h3 className="font-bold text-gray-800 mb-4">Ventas por Categoría</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <PieChart>
+                                <Pie data={reportData.ventasPorCategoria} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="valor">
+                                    {reportData.ventasPorCategoria.map((entry: any, index: number) => (
+                                        <Cell key={`cell-${index}`} fill={PIE_CHART_COLORS[index % PIE_CHART_COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip />
+                                <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            </section>
 
-            {/* Gráficos */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                {/* Ventas Mensuales */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">Ventas Mensuales (Período: {translateDateRange(dateRange)})</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <LineChart data={reportData.ventasMensuales}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="mes" />
-                            <YAxis />
-                            <Tooltip formatter={(value: number) => `Bs. ${value.toLocaleString('es-BO')}`} /> {/* Formato de moneda */}
-                            <Legend />
-                            <Line type="monotone" dataKey="ventas" stroke={PRIMARY_COLOR} strokeWidth={3} name="Ventas (Bs.)" />
-                        </LineChart>
-                    </ResponsiveContainer>
+            <section className="bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-300">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                    <div>
+                        <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <Layers className="w-6 h-6 text-oasis-primary" />
+                            Gestor de Reportes Personalizados
+                        </h2>
+                        <p className="text-gray-500 text-sm mt-1">Crea reportes combinando módulos (Ej. Ventas + Inventario) y guárdalos aquí.</p>
+                    </div>
+                    <button 
+                        onClick={() => setIsModalOpen(true)}
+                        className="bg-gray-900 hover:bg-black text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium shadow-lg shadow-gray-200 transition-all"
+                    >
+                        <Plus className="w-5 h-5" />
+                        Crear Reporte Combinado
+                    </button>
                 </div>
 
-                {/* Ventas por Categoría */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">Ventas por Categoría (Período: {translateDateRange(dateRange)})</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <PieChart>
-                            <Pie
-                                data={reportData.ventasPorCategoria}
-                                cx="50%"
-                                cy="50%"
-                                labelLine={false}
-                                label={(entry) => `${entry.payload.categoria} ${entry.payload.valor}%`}
-                                outerRadius={100}
-                                fill="#8884d8"
-                                dataKey="valor"
-                            >
-                                {reportData.ventasPorCategoria.map((entry: any, index: number) => (
-                                    <Cell key={`cell-${index}`} fill={PIE_CHART_COLORS[index % PIE_CHART_COLORS.length]} />
-                                ))}
-                            </Pie>
-                            <Tooltip formatter={(value: number, name: string, props: any) => [`Bs. ${props.payload.monto.toLocaleString('es-BO')}`, name]} /> {/* Mostrar monto en tooltip */}
-                            <Legend />
-                        </PieChart>
-                    </ResponsiveContainer>
-                </div>
-            </div>
-
-            {/* Historial Detallado / Bitácora */}
-            {reportData.activityLog?.length > 0 && (
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">Bitácora de Actividades Recientes</h3>
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="border-b border-gray-200">
-                                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Fecha/Hora</th>
-                                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Acción</th>
-                                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Usuario</th>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    {customReports.length > 0 ? (
+                        <table className="w-full text-left">
+                            <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 text-xs uppercase font-semibold">
+                                <tr>
+                                    <th className="px-6 py-4">Nombre del Reporte</th>
+                                    <th className="px-6 py-4">Módulos Incluidos</th>
+                                    <th className="px-6 py-4">Rango</th>
+                                    <th className="px-6 py-4">Generado</th>
+                                    <th className="px-6 py-4 text-right">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {reportData.activityLog.map((log: any, index: number) => (
-                                    <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
-                                        <td className="py-3 px-4 text-sm text-gray-600">{log.timestamp}</td>
-                                        <td className="py-3 px-4 font-semibold text-gray-900">{log.action}</td>
-                                        <td className="py-3 px-4 text-sm text-gray-700">{log.user}</td>
+                            <tbody className="divide-y divide-gray-100">
+                                {customReports.map((report) => (
+                                    <tr key={report.id} className="hover:bg-gray-50 transition-colors">
+                                        <td className="px-6 py-4">
+                                            <div className="font-medium text-gray-900">{report.title}</div>
+                                            <div className="text-xs text-gray-400 mt-0.5">{report.format} • {report.generatedBy}</div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex gap-1 flex-wrap">
+                                                {report.includedModules?.map((mod, idx) => (
+                                                    <span key={idx} className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs font-medium border border-blue-100">
+                                                        {mod}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-600">{report.dateRange}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-500">{report.generatedAt}</td>
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="flex justify-end gap-2">
+                                                {/* BOTÓN DESCARGA FUNCIONAL */}
+                                                <button 
+                                                    onClick={() => handleDownloadReport(report)}
+                                                    disabled={downloadingId === report.id}
+                                                    className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50" 
+                                                    title="Descargar"
+                                                >
+                                                    {downloadingId === report.id ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
+                                                </button>
+                                                <button onClick={() => handleDeleteReport(report.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Eliminar">
+                                                    <Trash2 className="w-5 h-5" />
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
-                    </div>
+                    ) : (
+                        <div className="p-12 text-center text-gray-400">
+                            <Layers className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                            <p>No tienes reportes personalizados guardados aún.</p>
+                        </div>
+                    )}
                 </div>
-            )}
+            </section>
+
+            <CustomReportModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSave={handleSaveCustomReport}
+            />
         </div>
     );
 }
-
-export default GeneralReportPage;
