@@ -1,7 +1,7 @@
 // app/dashboard/page.tsx
 import StatCard from "@/components/dashboard/StatCard";
 import Button from "@/components/ui/Button";
-
+import Footer from '@/components/layout/Footer';
 // Importamos nuestros íconos
 import PackageIcon from "@/components/icons/PackageIcon";
 import ShoppingCartIcon from "@/components/icons/ShoppingCartIcon";
@@ -103,7 +103,9 @@ const DashboardPage = () => {
         <div className="lg:col-span-1">
           <QuickAccessGrid />
         </div>
+        <Footer />
       </div>
+      
     </div>
   );
 };

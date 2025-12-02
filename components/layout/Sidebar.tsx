@@ -28,6 +28,7 @@ const Sidebar = () => {
   // ✅ ESTADO DINÁMICO: Controla qué menús están abiertos
   // Inicializamos basados en la URL actual para que al recargar siga abierto donde estabas
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({
+    Usuarios: pathname.startsWith('/dashboard/usuarios'),
     Productos: pathname.startsWith('/dashboard/productos'),
     Reportes: pathname.startsWith('/dashboard/reportes'),
   });
@@ -56,13 +57,28 @@ const Sidebar = () => {
       href: '/dashboard',
     },
     {
-      title: 'Productos', // ¡AHORA CON SUB-MENÚ!
+      title: 'Usuarios',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+          />
+        </svg>
+      ),
+      href: '/dashboard/usuarios',
+      children: [
+        { title: 'Gestión de Usuarios', href: '/dashboard/usuarios' },
+      ],
+    },
+
+    {
+      title: 'Productos',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
         </svg>
       ),
-      href: '/dashboard/productos', // Ruta base para el módulo de productos
+      href: '/dashboard/productos',
       children: [
         { title: 'Listado', href: '/dashboard/productos' },
         { title: 'Categorías', href: '/dashboard/productos/categorias' },
@@ -197,23 +213,16 @@ const Sidebar = () => {
                 }`}
             >
               <Link
-                href={item.children ? '#' : (item.href || '#')} // Si tiene hijos, el link padre no navega, solo colapsa
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${isActive(item.href)
-                  ? `bg-oasis-primary-light text-oasis-primary shadow-sm`
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                // Lógica para alternar la expansión del submenú
-                onClick={item.children
-                  ? (e) => {
-                    e.preventDefault();
-                    if (item.href === '/dashboard/reportes') {
-                      setReportsExpanded(!reportsExpanded);
-                    } else if (item.href === '/dashboard/productos') { // NUEVA LÓGICA
-                      setProductsExpanded(!productsExpanded);
-                    }
-                  }
-                  : undefined
-                }
+                href={item.children ? '#' : item.href}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${
+                  isActive(item.href)
+                    ? `bg-[${COLOR_PRIMARY}]/10 text-[${COLOR_PRIMARY}] shadow-sm`
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+                onClick={item.children ? (e) => {
+                    e.preventDefault(); 
+                    toggleMenu(item.title);
+                } : undefined}
               >
                 {/* Indicador lateral para item activo */}
                 {isActive(item.href) && (
@@ -231,7 +240,7 @@ const Sidebar = () => {
                   <span className="font-medium text-sm flex-1">{item.title}</span>
                 )}
 
-                {/* Ícono de flecha para desplegar (solo si no está colapsado y tiene hijos) */}
+                {/* Ícono de flecha para desplegar */}
                 {!isCollapsed && item.children && (
                   <svg
                     className={`w-4 h-4 ml-auto text-gray-400 transition-transform duration-200 ${(item.href === '/dashboard/reportes' && reportsExpanded) ||
@@ -255,33 +264,9 @@ const Sidebar = () => {
               </Link>
             </div>
 
-            {/* Sub-menú para Productos */}
-            {!isCollapsed && item.children && item.href === '/dashboard/productos' && productsExpanded && ( // Condición de expansión
-              <div className="ml-6 border-l border-gray-200 pl-3 space-y-1 mt-1">
-                {item.children.map((subItem) => (
-                  <Link
-                    key={subItem.href}
-                    href={subItem.href}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 group relative ${pathname === subItem.href
-                      ? `bg-oasis-accent-light text-oasis-accent`
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                      }`}
-                  >
-                    {pathname === subItem.href && (
-                      <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-oasis-accent rounded-r-full`} />
-                    )}
-                    <span className={`text-sm ${pathname === subItem.href ? `text-oasis-accent` : 'text-gray-500 group-hover:text-gray-700'
-                      }`}>
-                      {subItem.title}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            )}
-
-            {/* Sub-menú para Reportes */}
-            {!isCollapsed && item.children && item.href === '/dashboard/reportes' && reportsExpanded && ( // Condición de expansión
-              <div className="ml-6 border-l border-gray-200 pl-3 space-y-1 mt-1">
+            {/* Sub-menú */}
+            {!isCollapsed && item.children && expandedMenus[item.title] && (
+              <div className="ml-6 border-l border-gray-200 pl-3 space-y-1 mt-1 animate-in slide-in-from-top-1 fade-in-20 duration-200">
                 {item.children.map((subItem) => (
                   <Link
                     key={subItem.href}
